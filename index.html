@@ -6,50 +6,75 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="StudioHDA">
-<title>StudioHDA Banyo Protokolü</title>
+<title>StudioHDA Protokol</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --cream:#EDEAE3;--cream2:#E5E0D7;--dark:#2C2A25;--mid:#4A4740;--light:#7A766D;
   --rule:#9A9186;--faint:#C8C3BB;--white:#F9F7F3;
-  --green:#639922;--green-bg:#EAF3DE;--radius:14px;--radius-sm:8px;
+  --green:#639922;--green-bg:#EAF3DE;--red:#c0392b;--red-bg:#fdf0ee;
+  --radius:14px;--radius-sm:8px;
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden}
 
-/* ── TOP BAR ── */
+/* TOP BAR */
 .top-bar{position:sticky;top:0;z-index:100;background:var(--cream);border-bottom:0.5px solid var(--faint);padding:12px 20px 10px;display:flex;align-items:center;justify-content:space-between}
 .logo-text{font-size:13px;font-weight:600;letter-spacing:0.08em;color:var(--dark)}
 .logo-sub{font-size:10px;color:var(--light);letter-spacing:0.04em}
-.user-btn{width:34px;height:34px;border-radius:50%;background:var(--dark);color:var(--cream);font-size:12px;font-weight:600;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block;margin-left:6px;vertical-align:middle;transition:background 0.3s}
 .sync-dot.live{background:var(--green)}
 .sync-dot.saving{background:#F5A623;animation:pulse 0.8s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.user-btn{width:34px;height:34px;border-radius:50%;background:var(--dark);color:var(--cream);font-size:12px;font-weight:600;border:none;cursor:pointer}
 
-/* ── LOGIN ── */
+/* SCREENS */
+.screen{display:none}
+.screen.active{display:block}
+.hidden{display:none!important}
+
+/* LOGIN */
 .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 32px;gap:24px;background:var(--cream)}
 .login-logo{font-size:32px;font-weight:700;letter-spacing:0.06em;color:var(--dark)}
 .login-logo span{font-weight:300;color:var(--light)}
 .login-tagline{font-size:11px;color:var(--light);letter-spacing:0.1em;margin-top:4px}
 .login-card{background:var(--white);border-radius:var(--radius);border:0.5px solid var(--faint);padding:28px 24px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px}
-.login-card h2{font-size:17px;font-weight:600;color:var(--dark);margin-bottom:4px}
-.inp{width:100%;padding:12px 14px;border:0.5px solid var(--faint);border-radius:var(--radius-sm);background:var(--cream);color:var(--dark);font-size:15px;outline:none;-webkit-appearance:none;font-family:inherit}
+.login-card h2{font-size:17px;font-weight:600;color:var(--dark)}
+.inp{width:100%;padding:12px 14px;border:0.5px solid var(--faint);border-radius:var(--radius-sm);background:var(--cream);color:var(--dark);font-size:15px;outline:none;font-family:inherit}
 .inp:focus{border-color:var(--rule)}
-.btn-primary{width:100%;padding:14px;background:var(--dark);color:var(--cream);border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;letter-spacing:0.02em;font-family:inherit}
-.btn-primary:active{opacity:0.85}
+.btn-primary{width:100%;padding:14px;background:var(--dark);color:var(--cream);border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
 .btn-primary:disabled{opacity:0.5}
-.err-msg{font-size:13px;color:#c0392b;text-align:center;display:none}
+.btn-secondary{width:100%;padding:13px;background:transparent;color:var(--mid);border:0.5px solid var(--faint);border-radius:var(--radius-sm);font-size:14px;cursor:pointer;font-family:inherit}
+.err-msg{font-size:13px;color:var(--red);text-align:center;display:none}
 .login-note{font-size:12px;color:var(--light);text-align:center}
 
-/* ── SCREENS ── */
-.screen{display:none}
-.screen.active{display:block}
-.hidden{display:none!important}
+/* PROJECTS SCREEN */
+.page-header{padding:20px 20px 0}
+.page-header h2{font-size:20px;font-weight:700;color:var(--dark)}
+.page-header p{font-size:13px;color:var(--light);margin-top:4px}
 
-/* ── OVERVIEW ── */
-.overview-header{padding:20px 20px 0}
-.greeting{font-size:22px;font-weight:700;color:var(--dark);line-height:1.2}
-.greeting-sub{font-size:14px;color:var(--light);margin-top:4px}
+.project-grid{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.project-card{background:var(--white);border-radius:var(--radius);border:0.5px solid var(--faint);padding:16px;cursor:pointer;transition:border-color 0.15s}
+.project-card:active{border-color:var(--rule)}
+.proj-top{display:flex;justify-content:space-between;align-items:flex-start}
+.proj-name{font-size:16px;font-weight:600;color:var(--dark)}
+.proj-pct{font-size:20px;font-weight:700;color:var(--dark)}
+.proj-pct.done{color:var(--green)}
+.proj-meta{font-size:12px;color:var(--light);margin-top:3px;display:flex;flex-direction:column;gap:2px}
+.proj-bar{height:3px;background:var(--cream2);border-radius:2px;margin-top:10px}
+.proj-fill{height:3px;background:var(--rule);border-radius:2px;transition:width 0.3s}
+.proj-fill.done{background:var(--green)}
+.proj-count{font-size:12px;color:var(--light);margin-top:5px}
+
+.add-btn{display:flex;align-items:center;gap:10px;padding:14px 20px;border:1px dashed var(--faint);border-radius:var(--radius);cursor:pointer;color:var(--light);font-size:14px;margin:0 20px 20px;background:transparent;width:calc(100% - 40px);font-family:inherit}
+
+/* CHECKLIST SCREEN */
+.detail-header{padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid var(--faint);background:var(--cream);position:sticky;top:52px;z-index:50}
+.back-btn{font-size:22px;color:var(--mid);background:none;border:none;cursor:pointer;padding:0 8px 0 0}
+.detail-title{font-size:14px;font-weight:600;color:var(--dark);flex:1;line-height:1.3}
+.detail-badge{font-size:13px;font-weight:600;padding:4px 10px;border-radius:20px;background:var(--cream2);color:var(--mid)}
+.detail-badge.done{background:var(--green-bg);color:var(--green)}
+
+/* OVERALL CARD */
 .overall-card{margin:16px 20px;background:var(--dark);border-radius:var(--radius);padding:20px;color:var(--cream)}
 .overall-label{font-size:11px;letter-spacing:0.08em;opacity:0.6;margin-bottom:6px}
 .overall-pct{font-size:40px;font-weight:700;line-height:1}
@@ -57,32 +82,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .overall-fill{height:4px;background:var(--cream);border-radius:2px;transition:width 0.4s}
 .overall-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;opacity:0.55}
 
-/* ── SECTION CARDS ── */
-.section-list{padding:0 20px 20px;display:flex;flex-direction:column;gap:10px}
-.section-card{background:var(--white);border-radius:var(--radius);border:0.5px solid var(--faint);padding:16px;cursor:pointer;transition:border-color 0.15s}
+/* SECTION CARDS */
+.section-list{padding:0 20px 10px;display:flex;flex-direction:column;gap:10px}
+.section-card{background:var(--white);border-radius:var(--radius);border:0.5px solid var(--faint);padding:16px;cursor:pointer}
 .section-card:active{border-color:var(--rule)}
 .sec-top{display:flex;align-items:flex-start;justify-content:space-between}
 .sec-num{font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--light);margin-bottom:4px}
 .sec-title{font-size:15px;font-weight:600;color:var(--dark);line-height:1.3}
-.sec-right{text-align:right}
 .sec-pct{font-size:22px;font-weight:700;color:var(--dark)}
 .sec-pct.done{color:var(--green)}
 .sec-bar{height:3px;background:var(--cream2);border-radius:2px;margin-top:12px}
 .sec-fill{height:3px;background:var(--rule);border-radius:2px;transition:width 0.3s}
 .sec-fill.done{background:var(--green)}
 .sec-count{font-size:12px;color:var(--light);margin-top:6px}
-.last-edit{font-size:11px;color:var(--faint);margin-top:2px}
+.sec-actions{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:0.5px solid var(--cream2)}
+.sec-del-btn{font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;padding:0;font-family:inherit}
 
-/* ── DETAIL ── */
-.detail-header{padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid var(--faint);background:var(--cream);position:sticky;top:52px;z-index:50}
-.back-btn{font-size:22px;color:var(--mid);background:none;border:none;cursor:pointer;padding:0 8px 0 0;line-height:1}
-.detail-title{font-size:14px;font-weight:600;color:var(--dark);flex:1;line-height:1.3}
-.detail-badge{font-size:13px;font-weight:600;padding:4px 10px;border-radius:20px;background:var(--cream2);color:var(--mid)}
-.detail-badge.done{background:var(--green-bg);color:var(--green)}
+.add-section-btn{display:flex;align-items:center;gap:8px;padding:13px 20px;border:1px dashed var(--faint);border-radius:var(--radius);cursor:pointer;color:var(--light);font-size:13px;margin:0 20px;background:transparent;width:calc(100% - 40px);font-family:inherit}
 
+/* ITEMS */
 .item-list{padding:12px 20px;display:flex;flex-direction:column;gap:8px}
-.item-card{background:var(--white);border-radius:var(--radius-sm);border:0.5px solid var(--faint);overflow:hidden;transition:border-color 0.2s}
-.item-card.checked-card{border-color:var(--faint)}
+.item-card{background:var(--white);border-radius:var(--radius-sm);border:0.5px solid var(--faint);overflow:hidden}
 .item-main{display:flex;align-items:flex-start;gap:12px;padding:14px}
 .check-circle{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--faint);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;margin-top:1px}
 .check-circle.checked{background:var(--dark);border-color:var(--dark)}
@@ -92,12 +112,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .item-title.checked{color:var(--light);text-decoration:line-through}
 .item-desc{font-size:13px;color:var(--mid);line-height:1.5;margin-top:4px}
 .item-desc.checked{color:var(--faint)}
-.item-who{font-size:11px;color:var(--faint);margin-top:6px}
-
+.item-who{font-size:11px;color:var(--faint);margin-top:5px}
 .item-actions{display:flex;gap:8px;padding:0 14px 12px 52px}
 .action-btn{font-size:12px;color:var(--light);background:var(--cream);border:0.5px solid var(--faint);border-radius:20px;padding:5px 12px;cursor:pointer}
-.action-btn:active{opacity:0.7}
-
 .item-extras{border-top:0.5px solid var(--cream2)}
 .note-area{width:100%;padding:10px 14px;border:none;background:transparent;font-size:13px;color:var(--mid);resize:none;font-family:inherit;outline:none;min-height:60px}
 .photo-strip{display:flex;gap:8px;padding:10px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -105,22 +122,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .photo-add{width:72px;height:72px;border-radius:var(--radius-sm);border:1px dashed var(--faint);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;font-size:26px;color:var(--faint)}
 .hidden-input{display:none}
 
-/* ── ACTIVITY FEED ── */
-.activity-header{padding:20px 20px 8px}
-.activity-header h2{font-size:20px;font-weight:700;color:var(--dark)}
-.activity-header p{font-size:13px;color:var(--light);margin-top:4px}
+.add-item-btn{display:flex;align-items:center;gap:8px;padding:13px 20px;border:1px dashed var(--faint);border-radius:var(--radius-sm);cursor:pointer;color:var(--light);font-size:13px;margin:0 20px 12px;background:transparent;width:calc(100% - 40px);font-family:inherit}
+
+/* ACTIVITY */
 .activity-list{padding:0 20px;display:flex;flex-direction:column;gap:8px}
 .activity-item{background:var(--white);border-radius:var(--radius-sm);border:0.5px solid var(--faint);padding:12px 14px}
 .act-user{font-size:12px;font-weight:600;color:var(--dark)}
 .act-action{font-size:13px;color:var(--mid);margin-top:2px}
 .act-time{font-size:11px;color:var(--faint);margin-top:4px}
-.act-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.act-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
 .act-dot.check{background:var(--green)}
 .act-dot.note{background:#9A9186}
 .act-dot.photo{background:#4A90E2}
 .empty-state{text-align:center;padding:40px 20px;color:var(--light);font-size:14px}
 
-/* ── TAB BAR ── */
+/* TAB BAR */
 .tab-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(237,234,227,0.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:0.5px solid var(--faint);display:flex;padding:8px 0;padding-bottom:calc(8px + env(safe-area-inset-bottom))}
 .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0}
 .tab-icon{font-size:20px;line-height:1}
@@ -128,11 +144,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .tab-item.active .tab-label{color:var(--dark);font-weight:600}
 .tab-spacer{height:80px}
 
-/* ── TOAST ── */
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.modal-sheet{background:var(--cream);border-radius:20px 20px 0 0;padding:24px 20px;width:100%;max-width:480px;display:flex;flex-direction:column;gap:14px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.modal-title{font-size:17px;font-weight:600;color:var(--dark)}
+.modal-actions{display:flex;gap:10px;margin-top:4px}
+.modal-actions .btn-primary{flex:1;padding:12px}
+.modal-actions .btn-secondary{flex:1;padding:12px}
+
+/* TOAST */
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--dark);color:var(--cream);padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:opacity 0.3s;z-index:999;white-space:nowrap}
 .toast.show{opacity:1}
 
-/* ── LOADING ── */
+/* LOADING */
 .loading-overlay{position:fixed;inset:0;background:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999}
 .loading-logo{font-size:28px;font-weight:700;color:var(--dark);letter-spacing:0.06em}
 .loading-dots{display:flex;gap:6px}
@@ -154,11 +178,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 <div id="loginScreen" class="login-screen hidden">
   <div style="text-align:center">
     <div class="login-logo">studio<span>hda</span></div>
-    <div class="login-tagline">BANYO UYGULAMA PROTOKOLÜ</div>
+    <div class="login-tagline">MİMARLIK & MÜHENDİSLİK & İNŞAAT A.Ş.</div>
   </div>
   <div class="login-card">
     <h2>Giriş Yap</h2>
-    <input class="inp" id="loginEmail" type="email" placeholder="E-posta adresiniz" autocomplete="email">
+    <input class="inp" id="loginEmail" type="email" placeholder="E-posta" autocomplete="email">
     <input class="inp" id="loginPass" type="password" placeholder="Şifre" autocomplete="current-password">
     <div class="err-msg" id="loginErr">E-posta veya şifre hatalı</div>
     <button class="btn-primary" id="loginBtn" onclick="doLogin()">Giriş Yap</button>
@@ -177,42 +201,63 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   <button class="user-btn" id="userInitials" onclick="doLogout()">--</button>
 </div>
 
+<!-- SCREEN: PROJECTS -->
+<div id="screenProjects" class="screen active">
+  <div class="page-header">
+    <h2>Projeler</h2>
+    <p>Aktif şantiye projeleriniz</p>
+  </div>
+  <div class="project-grid" id="projectGrid"></div>
+  <button class="add-btn" onclick="showAddProject()">
+    <span style="font-size:22px">+</span> Yeni Proje Ekle
+  </button>
+  <div class="tab-spacer"></div>
+</div>
+
 <!-- SCREEN: CHECKLIST -->
-<div id="screenOverview" class="screen active">
-  <div class="overview-header">
-    <div class="greeting" id="greetingText">Merhaba</div>
-    <div class="greeting-sub">Banyo Uygulama Protokolü</div>
+<div id="screenChecklist" class="screen">
+  <div class="detail-header">
+    <button class="back-btn" onclick="goToProjects()">‹</button>
+    <div class="detail-title" id="checklistTitle">Proje</div>
+    <div class="detail-badge" id="checklistBadge">0%</div>
   </div>
   <div class="overall-card">
     <div class="overall-label">GENEL İLERLEME</div>
     <div class="overall-pct" id="overallPct">0%</div>
     <div class="overall-bar"><div class="overall-fill" id="overallFill" style="width:0%"></div></div>
     <div class="overall-meta">
-      <span id="overallDone">0 madde tamamlandı</span>
-      <span id="overallTotal">0 madde toplam</span>
+      <span id="overallDone">0 tamamlandı</span>
+      <span id="overallTotal">0 toplam</span>
     </div>
   </div>
   <div class="section-list" id="sectionList"></div>
+  <button class="add-section-btn" onclick="showAddSection()">
+    <span style="font-size:18px">+</span> Yeni Bölüm Ekle
+  </button>
   <div class="tab-spacer"></div>
 </div>
 
-<!-- SCREEN: DETAIL -->
-<div id="screenDetail" class="screen">
+<!-- SCREEN: SECTION DETAIL -->
+<div id="screenSection" class="screen">
   <div class="detail-header">
-    <button class="back-btn" onclick="goBack()">‹</button>
-    <div class="detail-title" id="detailTitle"></div>
-    <div class="detail-badge" id="detailBadge">0%</div>
+    <button class="back-btn" onclick="goToChecklist()">‹</button>
+    <div class="detail-title" id="sectionTitle">Bölüm</div>
+    <div class="detail-badge" id="sectionBadge">0%</div>
   </div>
   <div class="item-list" id="itemList"></div>
+  <button class="add-item-btn" onclick="showAddItem()">
+    <span style="font-size:18px">+</span> Yeni Madde Ekle
+  </button>
   <div class="tab-spacer"></div>
 </div>
 
 <!-- SCREEN: ACTIVITY -->
 <div id="screenActivity" class="screen">
-  <div class="activity-header">
+  <div class="page-header">
     <h2>Ekip Aktivitesi</h2>
     <p>Son yapılan değişiklikler</p>
   </div>
+  <div style="height:16px"></div>
   <div class="activity-list" id="activityList">
     <div class="empty-state">Henüz aktivite yok</div>
   </div>
@@ -221,9 +266,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 
 <!-- TAB BAR -->
 <div class="tab-bar">
-  <div class="tab-item active" id="tab-overview" onclick="switchTab('overview')">
-    <span class="tab-icon">☑</span>
-    <span class="tab-label">Checklist</span>
+  <div class="tab-item active" id="tab-projects" onclick="switchTab('projects')">
+    <span class="tab-icon">⊞</span>
+    <span class="tab-label">Projeler</span>
   </div>
   <div class="tab-item" id="tab-activity" onclick="switchTab('activity')">
     <span class="tab-icon">◎</span>
@@ -233,20 +278,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 
 </div><!-- /appWrapper -->
 
+<!-- MODALS -->
+<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-title" id="modalTitle">Yeni Proje</div>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModalDirect()">İptal</button>
+      <button class="btn-primary" id="modalSaveBtn" onclick="modalSave()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<!-- ══════════════════════════════════════════════════════════
-     FIREBASE SDK  — v10 modular (compat shim for brevity)
-     ══════════════════════════════════════════════════════════ -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
-/* ══════════════════════════════════════════════════
-   🔧 BURAYA KENDİ FIREBASE YAPILANDIRMANIZI YAPIŞTIRINIZ
-   Firebase Console → Project Settings → Your apps → Config
-   ══════════════════════════════════════════════════ */
 const firebaseConfig = {
   apiKey: "AIzaSyCvkt_el-uPO6KHIjWiSubppBFhBnva6qA",
   authDomain: "studiohda-banyo.firebaseapp.com",
@@ -258,76 +309,39 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db   = firebase.firestore();
-
-/* ── PROTOKOL VERİSİ ── */
-const PROTOCOL = [
-  { num:'01', title:'TASARIM VE TEKNİK OFİS SÜRECİ', items:[
-    {title:'Milimetrik Röleve', desc:'Lazer tarama ile mekanın mevcut durumu dijital ortama aktarılır.'},
-    {title:'Aplikasyon Projeleri', desc:'Tesisat çıkışları, seramik modülasyonu ve mobilya aksları 1/10 ve 1/20 detaylarında projelendirilir.'},
-    {title:'Malzeme Seçimi', desc:'60×120 cm veya üzeri büyük ebatlı porselen seramikler, 60 cm lineer süzgeçler ve armatürlerin teknik föyleri üzerinden sistem detayları oluşturulur.'},
-    {title:'Yerleşim Planı', desc:'Seramiğin başlangıç noktası (full-tile) ve süzgeç aksı simetrisi, kapı girişinden itibaren görsel kusursuzluk sağlayacak şekilde kurgulanır.'},
-  ]},
-  { num:'02', title:'KABA HAZIRLIK VE ALTYAPI', items:[
-    {title:'Referans Hattı', desc:'Lazer nivo ile tüm duvarlara bitmiş döşemeden +100 cm "Metre Çizgisi" atılır.'},
-    {title:'Sıhhi Tesisat', desc:'Sol Sıcak, Sağ Soğuk kuralı tavizsiz uygulanır. Boru güzergahları duvara markalanır ve as-built fotoğrafları arşivlenir.'},
-    {title:'Basınç Testi', desc:'Tesisata 10–15 bar basınç uygulanarak manometre takılır; uygulama sonuna kadar sistem basınç altında tutulur.'},
-    {title:'Gömme Rezervuar', desc:'Şaseler doğrudan kaba betona çelik dübel ile sabitlenir. Şap üstü montaja izin verilmez.'},
-    {title:'Lineer Süzgeç', desc:'304 paslanmaz gövdeli, izolasyon etekli 60 cm süzgeç, lazerle bitiş kotuna set edilerek sabitlenir.'},
-  ]},
-  { num:'03', title:'GEOMETRİK DOĞRULAMA VE ŞAP', items:[
-    {title:'Ano Çıtaları ve Karasiva', desc:'Duvarlar, 90 derece gönye kontrolüyle ano çıtaları eşliğinde mastarlı karasiva ile düzlenir.'},
-    {title:'Polipropilen Elyaf Katkılı Şap', desc:'Mikserine 600–900 gr/m³ elyaf eklenen şap, süzgece doğru %1–2 eğimle atılır.'},
-    {title:'Aderans', desc:'Şap öncesi beton yüzeye aderans malzemesi uygulanarak soğuk derz oluşumu önlenir.'},
-  ]},
-  { num:'04', title:'SU YALITIMI', items:[
-    {title:'Pah Bandı', desc:'Duvar-yer birleşimlerine fileli elastik bant uygulanır. (Weber, Mapei, Sika, Ardex veya muadili)'},
-    {title:'Çift Komponentli İzolasyon', desc:'İzolasyon malzemesi birbirine dik iki kat halinde, toplam 2–3 mm kalınlıkta uygulanır.'},
-    {title:'Barajlama Testi', desc:'Kapı eşiği setlenir, 3–5 cm su ile 24 saat sızdırmazlık testi yapılır. Test fotoğraflanarak belgelenir.'},
-  ]},
-  { num:'05', title:'İNCE İŞÇİLİK VE BİTİŞ', items:[
-    {title:'Seramik Uygulama', desc:'S2 sınıfı yüksek flex yapıştırıcı kullanılır. Yapıştırıcı seçimi teknik föyler doğrultusunda belirlenir.'},
-    {title:'45 Derece Pah (Jolly)', desc:'Tüm dış köşeler 45 derece kesilir, sulu kesim tezgahında rodajlanarak birleştirilir. Profil kullanılmaz.'},
-    {title:'Epoksi Derz', desc:'Su emilimi sıfır, leke tutmaz epoksi derz dolgusu ile tamamlanır.'},
-  ]},
-  { num:'06', title:'OTOMASYON VE MONTAJ', items:[
-    {title:'Su Baskın Sensörü', desc:'Lavabo dolabı altına, zemine 2 mm mesafede yerleştirilir; solenoid vana ile entegre edilir.'},
-    {title:'Aydınlatma', desc:'IP67 LED nişler, buğu önleyici ayna rezistansları ve sensörlü gece aydınlatması aktive edilir.'},
-  ]},
-];
+const db = firebase.firestore();
 
 /* ── STATE ── */
 let currentUser = null;
-let projectData = {};   // { checks:{}, notes:{}, photos:{} }
-let unsubscribe = null;
-let currentSection = -1;
+let allData = {};        // { projects:{}, activity:[] }
+let unsub = null;
+let activeProjectId = null;
+let activeSectionId = null;
+let modalMode = null;    // 'addProject' | 'addSection' | 'addItem' | 'editProject'
 
 /* ── HELPERS ── */
-const ikey = (si,ii) => `${si}_${ii}`;
-
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
 }
-
-function setSyncState(state) {
+function setSync(s) {
   const dot = document.getElementById('syncDot');
   const lbl = document.getElementById('syncLabel');
-  if (state === 'live')   { dot.className='sync-dot live'; lbl.textContent='Canlı senkronize'; }
-  else if(state==='saving'){ dot.className='sync-dot saving'; lbl.textContent='Kaydediliyor...'; }
-  else                    { dot.className='sync-dot'; lbl.textContent='Bağlantı yok'; }
+  if (s==='live'){dot.className='sync-dot live';lbl.textContent='Canlı senkronize';}
+  else if(s==='saving'){dot.className='sync-dot saving';lbl.textContent='Kaydediliyor...';}
+  else{dot.className='sync-dot';lbl.textContent='Bağlantı yok';}
 }
-
 function timeAgo(ts) {
   if (!ts) return '';
   const d = ts.toDate ? ts.toDate() : new Date(ts);
-  const diff = Math.floor((Date.now() - d) / 1000);
-  if (diff < 60) return 'az önce';
-  if (diff < 3600) return Math.floor(diff/60) + ' dk önce';
-  if (diff < 86400) return Math.floor(diff/3600) + ' sa önce';
-  return Math.floor(diff/86400) + ' gün önce';
+  const diff = Math.floor((Date.now()-d)/1000);
+  if (diff<60) return 'az önce';
+  if (diff<3600) return Math.floor(diff/60)+' dk önce';
+  if (diff<86400) return Math.floor(diff/3600)+' sa önce';
+  return Math.floor(diff/86400)+' gün önce';
 }
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
 
 /* ── AUTH ── */
 auth.onAuthStateChanged(user => {
@@ -336,13 +350,11 @@ auth.onAuthStateChanged(user => {
     currentUser = user;
     const name = user.email.split('@')[0];
     document.getElementById('userInitials').textContent = name.substring(0,2).toUpperCase();
-    document.getElementById('greetingText').textContent = 'Merhaba, ' + name;
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('appWrapper').classList.remove('hidden');
-    subscribeToProject();
+    subscribe();
   } else {
-    currentUser = null;
-    if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+    if (unsub) { unsub(); unsub=null; }
     document.getElementById('loginScreen').classList.remove('hidden');
     document.getElementById('appWrapper').classList.add('hidden');
   }
@@ -350,310 +362,427 @@ auth.onAuthStateChanged(user => {
 
 function doLogin() {
   const email = document.getElementById('loginEmail').value.trim();
-  const pass  = document.getElementById('loginPass').value;
-  const btn   = document.getElementById('loginBtn');
-  const err   = document.getElementById('loginErr');
-  if (!email || !pass) { err.textContent='Tüm alanları doldurun'; err.style.display='block'; return; }
-  btn.disabled = true; btn.textContent = 'Giriş yapılıyor...';
-  err.style.display = 'none';
-  auth.signInWithEmailAndPassword(email, pass)
-    .catch(e => {
-      err.textContent = 'E-posta veya şifre hatalı';
-      err.style.display = 'block';
-      btn.disabled = false; btn.textContent = 'Giriş Yap';
-    });
+  const pass = document.getElementById('loginPass').value;
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginErr');
+  if (!email||!pass){err.textContent='Tüm alanları doldurun';err.style.display='block';return;}
+  btn.disabled=true; btn.textContent='Giriş yapılıyor...'; err.style.display='none';
+  auth.signInWithEmailAndPassword(email,pass)
+    .catch(e=>{err.textContent='E-posta veya şifre hatalı';err.style.display='block';btn.disabled=false;btn.textContent='Giriş Yap';});
 }
+function doLogout() { if(confirm('Çıkış yapmak istiyor musunuz?')) auth.signOut(); }
 
-function doLogout() {
-  if (confirm('Çıkış yapmak istiyor musunuz?')) auth.signOut();
-}
+/* ── FIRESTORE ── */
+const docRef = () => db.collection('app').doc('data');
 
-/* ── FIRESTORE REALTIME SYNC ── */
-function subscribeToProject() {
-  setSyncState('saving');
-  const docRef = db.collection('projects').doc('banyo-protokolu');
-
-  unsubscribe = docRef.onSnapshot(snap => {
-    if (snap.exists) {
-      projectData = snap.data();
-    } else {
-      projectData = { checks:{}, notes:{}, photos:{}, activity:[] };
-      docRef.set(projectData);
-    }
-    setSyncState('live');
-    renderOverview();
-    if (currentSection >= 0) renderItems(currentSection);
+function subscribe() {
+  setSync('saving');
+  unsub = docRef().onSnapshot(snap => {
+    if (snap.exists) { allData = snap.data(); }
+    else { allData = {projects:{}, activity:[]}; docRef().set(allData); }
+    setSync('live');
+    renderProjects();
+    if (activeProjectId) renderChecklist(activeProjectId);
+    if (activeSectionId) renderSection(activeSectionId);
     renderActivity();
-  }, err => {
-    setSyncState('offline');
-    toast('Bağlantı kesildi, yeniden deneniyor...');
+  }, () => { setSync('offline'); toast('Bağlantı kesildi...'); });
+}
+
+async function save(update) {
+  setSync('saving');
+  await docRef().update(update);
+}
+
+function userName() { return currentUser.email.split('@')[0]; }
+
+async function logActivity(type, desc) {
+  const entry = { user: userName(), type, description: desc, time: firebase.firestore.FieldValue.serverTimestamp() };
+  await docRef().update({ activity: firebase.firestore.FieldValue.arrayUnion(entry) });
+}
+
+/* ── PROJECTS ── */
+function renderProjects() {
+  const grid = document.getElementById('projectGrid');
+  const projects = allData.projects || {};
+  const keys = Object.keys(projects).sort((a,b) => (projects[b].createdAt||0)-(projects[a].createdAt||0));
+  
+  grid.innerHTML = '';
+  if (!keys.length) {
+    grid.innerHTML = '<div class="empty-state" style="padding:30px 0">Henüz proje yok.<br>Yeni proje ekleyin.</div>';
+    return;
+  }
+  
+  keys.forEach(pid => {
+    const proj = projects[pid];
+    const sections = proj.sections || {};
+    let total=0, done=0;
+    Object.values(sections).forEach(sec => {
+      const items = sec.items || {};
+      Object.values(items).forEach(item => { total++; if(item.checked) done++; });
+    });
+    const pct = total>0 ? Math.round(done/total*100) : 0;
+    const isDone = pct===100 && total>0;
+
+    const card = document.createElement('div');
+    card.className = 'project-card';
+    card.innerHTML = `
+      <div class="proj-top">
+        <div>
+          <div class="proj-name">${proj.name}</div>
+          <div class="proj-meta">
+            ${proj.client ? `<span>👤 ${proj.client}</span>` : ''}
+            ${proj.address ? `<span>📍 ${proj.address}</span>` : ''}
+            ${proj.date ? `<span>📅 ${proj.date}</span>` : ''}
+          </div>
+        </div>
+        <div class="proj-pct ${isDone?'done':''}">${pct}%</div>
+      </div>
+      <div class="proj-bar"><div class="proj-fill ${isDone?'done':''}" style="width:${pct}%"></div></div>
+      <div class="proj-count">${done} / ${total} madde tamamlandı · ${Object.keys(sections).length} bölüm</div>
+    `;
+    card.onclick = () => openProject(pid);
+    grid.appendChild(card);
   });
 }
 
-async function writeField(field, key, value) {
-  setSyncState('saving');
-  const docRef = db.collection('projects').doc('banyo-protokolu');
-  await docRef.update({ [`${field}.${key}`]: value });
+function openProject(pid) {
+  activeProjectId = pid;
+  activeSectionId = null;
+  renderChecklist(pid);
+  showScreen('checklist');
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
 }
 
-async function addActivity(type, description) {
-  const docRef = db.collection('projects').doc('banyo-protokolu');
-  const entry = {
-    user: currentUser.email.split('@')[0],
-    type, description,
-    time: firebase.firestore.FieldValue.serverTimestamp()
-  };
-  await docRef.update({
-    activity: firebase.firestore.FieldValue.arrayUnion(entry)
+function goToProjects() {
+  activeProjectId = null;
+  activeSectionId = null;
+  showScreen('projects');
+  switchTab('projects');
+}
+
+/* ── CHECKLIST ── */
+function renderChecklist(pid) {
+  const proj = (allData.projects||{})[pid];
+  if (!proj) return;
+  document.getElementById('checklistTitle').textContent = proj.name;
+  
+  const sections = proj.sections || {};
+  const skeys = Object.keys(sections).sort((a,b)=>(sections[a].order||0)-(sections[b].order||0));
+  
+  let total=0, done=0;
+  skeys.forEach(sid => {
+    const items = sections[sid].items || {};
+    Object.values(items).forEach(item => { total++; if(item.checked) done++; });
   });
-}
-
-/* ── RENDER OVERVIEW ── */
-function renderOverview() {
-  const checks = projectData.checks || {};
-  let total = 0, done = 0;
+  
+  const pct = total>0 ? Math.round(done/total*100) : 0;
+  document.getElementById('overallPct').textContent = pct+'%';
+  document.getElementById('overallFill').style.width = pct+'%';
+  document.getElementById('overallDone').textContent = done+' tamamlandı';
+  document.getElementById('overallTotal').textContent = total+' toplam';
+  const badge = document.getElementById('checklistBadge');
+  badge.textContent = pct+'%';
+  badge.className = 'detail-badge'+(pct===100&&total>0?' done':'');
+  
   const list = document.getElementById('sectionList');
   list.innerHTML = '';
+  
+  if (!skeys.length) {
+    list.innerHTML = '<div class="empty-state">Henüz bölüm yok.<br>Aşağıdan bölüm ekleyin.</div>';
+    return;
+  }
 
-  PROTOCOL.forEach((sec, si) => {
-    const secTotal = sec.items.length;
-    let secDone = 0;
-    sec.items.forEach((_, ii) => { if (checks[ikey(si,ii)]) secDone++; });
-    total += secTotal; done += secDone;
-    const pct = Math.round(secDone/secTotal*100);
-    const isDone = pct === 100;
+  skeys.forEach(sid => {
+    const sec = sections[sid];
+    const items = sec.items || {};
+    const secTotal = Object.keys(items).length;
+    const secDone = Object.values(items).filter(i=>i.checked).length;
+    const secPct = secTotal>0 ? Math.round(secDone/secTotal*100) : 0;
+    const isDone = secPct===100 && secTotal>0;
 
     const card = document.createElement('div');
     card.className = 'section-card';
     card.innerHTML = `
-      <div class="sec-top">
+      <div class="sec-top" onclick="openSection('${sid}')">
         <div style="flex:1;min-width:0">
-          <div class="sec-num">${sec.num}</div>
+          <div class="sec-num">${sec.num||''}</div>
           <div class="sec-title">${sec.title}</div>
         </div>
-        <div class="sec-right" style="margin-left:12px;flex-shrink:0">
-          <div class="sec-pct ${isDone?'done':''}">${pct}%</div>
+        <div style="text-align:right;flex-shrink:0;margin-left:12px">
+          <div class="sec-pct ${isDone?'done':''}">${secPct}%</div>
           <div style="font-size:16px;color:var(--faint)">›</div>
         </div>
       </div>
-      <div class="sec-bar"><div class="sec-fill ${isDone?'done':''}" style="width:${pct}%"></div></div>
-      <div class="sec-count">${secDone} / ${secTotal} madde tamamlandı</div>
+      <div class="sec-bar"><div class="sec-fill ${isDone?'done':''}" style="width:${secPct}%"></div></div>
+      <div class="sec-count">${secDone} / ${secTotal} madde</div>
+      <div class="sec-actions">
+        <button class="sec-del-btn" onclick="deleteSection('${pid}','${sid}')">🗑 Bölümü Sil</button>
+      </div>
     `;
-    card.onclick = () => openSection(si);
     list.appendChild(card);
   });
-
-  const pct = total > 0 ? Math.round(done/total*100) : 0;
-  document.getElementById('overallPct').textContent = pct + '%';
-  document.getElementById('overallFill').style.width = pct + '%';
-  document.getElementById('overallDone').textContent = done + ' madde tamamlandı';
-  document.getElementById('overallTotal').textContent = total + ' madde toplam';
 }
 
-/* ── OPEN SECTION ── */
-function openSection(si) {
-  currentSection = si;
-  const sec = PROTOCOL[si];
-  document.getElementById('detailTitle').textContent = sec.num + ' — ' + sec.title;
-  updateBadge();
-  renderItems(si);
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screenDetail').classList.add('active');
-  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+function openSection(sid) {
+  activeSectionId = sid;
+  renderSection(sid);
+  showScreen('section');
 }
 
-function updateBadge() {
-  const sec = PROTOCOL[currentSection];
-  const checks = projectData.checks || {};
-  let done = 0;
-  sec.items.forEach((_, ii) => { if (checks[ikey(currentSection,ii)]) done++; });
-  const pct = Math.round(done/sec.items.length*100);
-  const badge = document.getElementById('detailBadge');
-  badge.textContent = pct + '%';
-  badge.className = 'detail-badge' + (pct===100?' done':'');
+function goToChecklist() {
+  activeSectionId = null;
+  showScreen('checklist');
 }
 
-/* ── RENDER ITEMS ── */
-function renderItems(si) {
-  const sec = PROTOCOL[si];
-  const checks = projectData.checks || {};
-  const notes  = projectData.notes  || {};
-  const photos  = projectData.photos  || {};
+async function deleteSection(pid, sid) {
+  if (!confirm('Bu bölümü silmek istiyor musunuz? Tüm maddeler de silinecek.')) return;
+  await save({ [`projects.${pid}.sections.${sid}`]: firebase.firestore.FieldValue.delete() });
+  toast('Bölüm silindi');
+}
+
+/* ── SECTION ── */
+function renderSection(sid) {
+  const proj = (allData.projects||{})[activeProjectId];
+  if (!proj) return;
+  const sec = (proj.sections||{})[sid];
+  if (!sec) return;
+  
+  document.getElementById('sectionTitle').textContent = (sec.num?sec.num+' — ':'')+sec.title;
+  
+  const items = sec.items || {};
+  const ikeys = Object.keys(items).sort((a,b)=>(items[a].order||0)-(items[b].order||0));
+  const total = ikeys.length;
+  const done = ikeys.filter(k=>items[k].checked).length;
+  const pct = total>0 ? Math.round(done/total*100) : 0;
+  const badge = document.getElementById('sectionBadge');
+  badge.textContent = pct+'%';
+  badge.className = 'detail-badge'+(pct===100&&total>0?' done':'');
+
   const list = document.getElementById('itemList');
   list.innerHTML = '';
 
-  sec.items.forEach((item, ii) => {
-    const key = ikey(si, ii);
-    const checked = !!checks[key];
-    const note = notes[key] || '';
-    const itemPhotos = photos[key] || [];
-    const checkMeta = projectData['checkMeta_'+key];
+  if (!ikeys.length) {
+    list.innerHTML = '<div class="empty-state">Henüz madde yok.<br>Aşağıdan madde ekleyin.</div>';
+    return;
+  }
+
+  ikeys.forEach(iid => {
+    const item = items[iid];
+    const checked = !!item.checked;
+    const note = item.note || '';
+    const photos = item.photos || [];
 
     const card = document.createElement('div');
-    card.className = 'item-card' + (checked?' checked-card':'');
+    card.className = 'item-card';
     card.innerHTML = `
       <div class="item-main">
-        <div class="check-circle ${checked?'checked':''}" onclick="toggleCheck(${si},${ii})"></div>
+        <div class="check-circle ${checked?'checked':''}" onclick="toggleCheck('${sid}','${iid}')"></div>
         <div class="item-content">
           <div class="item-title ${checked?'checked':''}">${item.title}</div>
-          <div class="item-desc ${checked?'checked':''}">${item.desc}</div>
-          ${checkMeta ? `<div class="item-who">${checkMeta.by} · ${timeAgo(checkMeta.at)}</div>` : ''}
+          ${item.desc ? `<div class="item-desc ${checked?'checked':''}">${item.desc}</div>` : ''}
+          ${item.checkedBy ? `<div class="item-who">${item.checkedBy} · ${timeAgo(item.checkedAt)}</div>` : ''}
         </div>
+        <button onclick="deleteItem('${sid}','${iid}')" style="background:none;border:none;color:var(--faint);font-size:16px;cursor:pointer;flex-shrink:0">✕</button>
       </div>
       <div class="item-actions">
-        <button class="action-btn" onclick="toggleNote('${key}')">📝 Not</button>
-        <button class="action-btn" onclick="triggerPhoto('${key}')">📷 Fotoğraf${itemPhotos.length>0?' ('+itemPhotos.length+')':''}</button>
+        <button class="action-btn" onclick="toggleNote('note-${iid}','extras-${iid}')">📝 Not</button>
+        <button class="action-btn" onclick="triggerPhoto('${iid}')">📷 Fotoğraf${photos.length>0?' ('+photos.length+')':''}</button>
       </div>
-      <div class="item-extras" id="extras-${key}" style="${note||itemPhotos.length?'':'display:none'}">
-        <div class="photo-strip" id="photos-${key}" style="${itemPhotos.length?'':'display:none'}">
-          ${itemPhotos.map(p=>`<img class="photo-thumb" src="${p}">`).join('')}
-          <div class="photo-add" onclick="triggerPhoto('${key}')">+</div>
+      <div class="item-extras" id="extras-${iid}" style="${note||photos.length?'':'display:none'}">
+        <div class="photo-strip" id="photos-${iid}" style="${photos.length?'':'display:none'}">
+          ${photos.map(p=>`<img class="photo-thumb" src="${p}">`).join('')}
+          <div class="photo-add" onclick="triggerPhoto('${iid}')">+</div>
         </div>
-        <textarea class="note-area" id="note-${key}" placeholder="Not ekle..." onblur="saveNote('${key}',this.value)">${note}</textarea>
+        <textarea class="note-area" id="note-${iid}" placeholder="Not ekle..." onblur="saveNote('${sid}','${iid}',this.value)">${note}</textarea>
       </div>
-      <input type="file" accept="image/*" capture="environment" class="hidden-input" id="pi-${key}" onchange="handlePhoto('${key}',this)">
+      <input type="file" accept="image/*" capture="environment" class="hidden-input" id="pi-${iid}" onchange="handlePhoto('${sid}','${iid}',this)">
     `;
     list.appendChild(card);
   });
 }
 
-/* ── TOGGLE CHECK ── */
-async function toggleCheck(si, ii) {
-  const key = ikey(si, ii);
-  const checks = projectData.checks || {};
-  const newVal = !checks[key];
-  const userName = currentUser.email.split('@')[0];
-  const sec = PROTOCOL[si];
-
-  projectData.checks = {...checks, [key]: newVal};
-  if (newVal) {
-    projectData['checkMeta_'+key] = { by: userName, at: new Date() };
-  } else {
-    delete projectData['checkMeta_'+key];
-  }
-
-  renderItems(si);
-  updateBadge();
-  renderOverview();
-
-  const docRef = db.collection('projects').doc('banyo-protokolu');
+async function toggleCheck(sid, iid) {
+  const proj = (allData.projects||{})[activeProjectId];
+  const item = (proj.sections[sid].items||{})[iid];
+  const newVal = !item.checked;
+  const uname = userName();
+  const now = firebase.firestore.FieldValue.serverTimestamp();
+  
   const update = {
-    [`checks.${key}`]: newVal,
-    [`checkMeta_${key}`]: newVal
-      ? { by: userName, at: firebase.firestore.FieldValue.serverTimestamp() }
-      : firebase.firestore.FieldValue.delete()
+    [`projects.${activeProjectId}.sections.${sid}.items.${iid}.checked`]: newVal,
+    [`projects.${activeProjectId}.sections.${sid}.items.${iid}.checkedBy`]: newVal ? uname : firebase.firestore.FieldValue.delete(),
+    [`projects.${activeProjectId}.sections.${sid}.items.${iid}.checkedAt`]: newVal ? now : firebase.firestore.FieldValue.delete(),
   };
-
+  
   const actEntry = {
-    user: userName,
-    type: newVal ? 'check' : 'uncheck',
-    description: (newVal?'Tamamladı: ':'Geri aldı: ') + sec.items[ii].title,
-    section: sec.num + ' ' + sec.title,
-    time: firebase.firestore.FieldValue.serverTimestamp()
+    user: uname, type: newVal?'check':'uncheck',
+    description: (newVal?'Tamamladı: ':'Geri aldı: ')+item.title,
+    project: (allData.projects[activeProjectId]||{}).name||'',
+    time: now
   };
   update['activity'] = firebase.firestore.FieldValue.arrayUnion(actEntry);
-
-  await docRef.update(update);
+  await docRef().update(update);
 }
 
-/* ── NOTE ── */
-function toggleNote(key) {
-  const extras = document.getElementById('extras-'+key);
-  const ta = document.getElementById('note-'+key);
+function toggleNote(noteId, extrasId) {
+  const extras = document.getElementById(extrasId);
+  const ta = document.getElementById(noteId);
   if (!extras) return;
-  if (extras.style.display === 'none') { extras.style.display=''; ta && ta.focus(); }
-  else { if (!(ta && ta.value.trim())) extras.style.display='none'; }
+  if (extras.style.display==='none'||!extras.style.display) { extras.style.display=''; ta&&ta.focus(); }
+  else if (!(ta&&ta.value.trim())) extras.style.display='none';
 }
 
-async function saveNote(key, val) {
-  const docRef = db.collection('projects').doc('banyo-protokolu');
-  await docRef.update({ [`notes.${key}`]: val });
-  const parts = key.split('_');
-  const si = parseInt(parts[0]), ii = parseInt(parts[1]);
-  const sec = PROTOCOL[si];
-  if (val.trim()) {
-    const actEntry = {
-      user: currentUser.email.split('@')[0],
-      type:'note',
-      description: 'Not ekledi: ' + sec.items[ii].title,
-      section: sec.num + ' ' + sec.title,
-      time: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    await docRef.update({ activity: firebase.firestore.FieldValue.arrayUnion(actEntry) });
-  }
+async function saveNote(sid, iid, val) {
+  await save({ [`projects.${activeProjectId}.sections.${sid}.items.${iid}.note`]: val });
   toast('Not kaydedildi');
 }
 
-/* ── PHOTO ── */
-function triggerPhoto(key) {
-  document.getElementById('pi-'+key).click();
+async function deleteItem(sid, iid) {
+  if (!confirm('Bu maddeyi silmek istiyor musunuz?')) return;
+  await save({ [`projects.${activeProjectId}.sections.${sid}.items.${iid}`]: firebase.firestore.FieldValue.delete() });
+  toast('Madde silindi');
 }
 
-function handlePhoto(key, input) {
-  const file = input.files[0];
-  if (!file) return;
-  // Compress before upload
+function triggerPhoto(iid) { document.getElementById('pi-'+iid)?.click(); }
+
+function handlePhoto(sid, iid, input) {
+  const file = input.files[0]; if (!file) return;
   const img = new Image();
   const url = URL.createObjectURL(file);
   img.onload = async () => {
     const canvas = document.createElement('canvas');
-    const max = 800;
-    let w = img.width, h = img.height;
-    if (w > max) { h = Math.round(h*max/w); w = max; }
+    const max=800; let w=img.width, h=img.height;
+    if(w>max){h=Math.round(h*max/w);w=max;}
     canvas.width=w; canvas.height=h;
     canvas.getContext('2d').drawImage(img,0,0,w,h);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+    const dataUrl = canvas.toDataURL('image/jpeg',0.75);
     URL.revokeObjectURL(url);
-
-    const docRef = db.collection('projects').doc('banyo-protokolu');
-    await docRef.update({ [`photos.${key}`]: firebase.firestore.FieldValue.arrayUnion(dataUrl) });
-
-    const parts = key.split('_');
-    const si=parseInt(parts[0]), ii=parseInt(parts[1]);
-    const sec = PROTOCOL[si];
-    const actEntry = {
-      user: currentUser.email.split('@')[0],
-      type:'photo',
-      description: 'Fotoğraf ekledi: '+sec.items[ii].title,
-      section: sec.num+' '+sec.title,
-      time: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    await docRef.update({ activity: firebase.firestore.FieldValue.arrayUnion(actEntry) });
+    await docRef().update({ [`projects.${activeProjectId}.sections.${sid}.items.${iid}.photos`]: firebase.firestore.FieldValue.arrayUnion(dataUrl) });
     toast('Fotoğraf kaydedildi');
   };
-  img.src = url;
-  input.value='';
+  img.src=url; input.value='';
 }
 
 /* ── ACTIVITY ── */
 function renderActivity() {
   const list = document.getElementById('activityList');
-  const activity = (projectData.activity || []).slice().reverse().slice(0,30);
+  const activity = (allData.activity||[]).slice().reverse().slice(0,40);
   if (!activity.length) { list.innerHTML='<div class="empty-state">Henüz aktivite yok</div>'; return; }
-  list.innerHTML = activity.map(a => `
+  list.innerHTML = activity.map(a=>`
     <div class="activity-item">
-      <div class="act-user">
-        <span class="act-dot ${a.type==='check'||a.type==='uncheck'?'check':a.type}"></span>
-        ${a.user}
-      </div>
+      <div class="act-user"><span class="act-dot ${a.type==='check'||a.type==='uncheck'?'check':a.type}"></span>${a.user}</div>
       <div class="act-action">${a.description}</div>
-      <div class="act-time">${a.section || ''} · ${timeAgo(a.time)}</div>
+      <div class="act-time">${a.project||''} · ${timeAgo(a.time)}</div>
     </div>
   `).join('');
 }
 
+/* ── MODALS ── */
+function showAddProject() {
+  modalMode = 'addProject';
+  document.getElementById('modalTitle').textContent = 'Yeni Proje Ekle';
+  document.getElementById('modalBody').innerHTML = `
+    <input class="inp" id="m_name" placeholder="Proje adı *" style="width:100%">
+    <input class="inp" id="m_client" placeholder="Müşteri adı" style="width:100%;margin-top:10px">
+    <input class="inp" id="m_address" placeholder="Adres / Konum" style="width:100%;margin-top:10px">
+    <input class="inp" id="m_date" placeholder="Tarih (ör: Mart 2025)" style="width:100%;margin-top:10px">
+  `;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('m_name').focus(),100);
+}
+
+function showAddSection() {
+  modalMode = 'addSection';
+  document.getElementById('modalTitle').textContent = 'Yeni Bölüm Ekle';
+  const proj = (allData.projects||{})[activeProjectId];
+  const secCount = Object.keys(proj?.sections||{}).length+1;
+  document.getElementById('modalBody').innerHTML = `
+    <input class="inp" id="m_secnum" placeholder="Bölüm no (ör: 07)" value="${secCount<10?'0'+secCount:secCount}" style="width:100%">
+    <input class="inp" id="m_sectitle" placeholder="Bölüm adı *" style="width:100%;margin-top:10px">
+  `;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('m_sectitle').focus(),100);
+}
+
+function showAddItem() {
+  modalMode = 'addItem';
+  document.getElementById('modalTitle').textContent = 'Yeni Madde Ekle';
+  document.getElementById('modalBody').innerHTML = `
+    <input class="inp" id="m_itemtitle" placeholder="Madde başlığı *" style="width:100%">
+    <textarea class="inp" id="m_itemdesc" placeholder="Açıklama (opsiyonel)" style="width:100%;margin-top:10px;min-height:80px;resize:none"></textarea>
+  `;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('m_itemtitle').focus(),100);
+}
+
+async function modalSave() {
+  if (modalMode==='addProject') {
+    const name = document.getElementById('m_name')?.value.trim();
+    if (!name) { toast('Proje adı zorunlu'); return; }
+    const pid = uid();
+    await save({
+      [`projects.${pid}`]: {
+        id: pid, name,
+        client: document.getElementById('m_client')?.value.trim()||'',
+        address: document.getElementById('m_address')?.value.trim()||'',
+        date: document.getElementById('m_date')?.value.trim()||'',
+        sections: {},
+        createdAt: Date.now(),
+        createdBy: userName()
+      }
+    });
+    toast('Proje eklendi');
+  }
+  else if (modalMode==='addSection') {
+    const title = document.getElementById('m_sectitle')?.value.trim();
+    if (!title) { toast('Bölüm adı zorunlu'); return; }
+    const sid = uid();
+    const proj = (allData.projects||{})[activeProjectId];
+    const order = Object.keys(proj?.sections||{}).length;
+    await save({
+      [`projects.${activeProjectId}.sections.${sid}`]: {
+        id: sid, title,
+        num: document.getElementById('m_secnum')?.value.trim()||'',
+        order, items: {}, createdAt: Date.now()
+      }
+    });
+    toast('Bölüm eklendi');
+  }
+  else if (modalMode==='addItem') {
+    const title = document.getElementById('m_itemtitle')?.value.trim();
+    if (!title) { toast('Madde başlığı zorunlu'); return; }
+    const iid = uid();
+    const sec = ((allData.projects||{})[activeProjectId]?.sections||{})[activeSectionId];
+    const order = Object.keys(sec?.items||{}).length;
+    await save({
+      [`projects.${activeProjectId}.sections.${activeSectionId}.items.${iid}`]: {
+        id: iid, title,
+        desc: document.getElementById('m_itemdesc')?.value.trim()||'',
+        checked: false, order, createdAt: Date.now()
+      }
+    });
+    toast('Madde eklendi');
+  }
+  closeModalDirect();
+}
+
+function closeModal(e) { if(e.target===document.getElementById('modalOverlay')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modalOverlay').classList.add('hidden'); modalMode=null; }
+
 /* ── NAV ── */
-function goBack() {
-  currentSection = -1;
-  switchTab('overview');
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen'+name.charAt(0).toUpperCase()+name.slice(1)).classList.add('active');
 }
 
 function switchTab(tab) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
-  document.getElementById('screen'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
-  const tabEl = document.getElementById('tab-'+tab);
-  if (tabEl) tabEl.classList.add('active');
+  if (tab==='projects') {
+    goToProjects();
+  } else {
+    showScreen(tab);
+    document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+    document.getElementById('tab-'+tab)?.classList.add('active');
+  }
 }
 </script>
 </body>
