@@ -494,8 +494,19 @@ const userDoc = () => db.collection('users').doc(me.uid);
 const prjCol  = () => userDoc().collection('projects');
 const actDoc  = () => userDoc().collection('meta').doc('activity');
 
+// Firestore rules test - eğer users path çalışmıyorsa fallback
+async function testAndInitFirestore() {
+  try {
+    await prjCol().limit(1).get();
+  } catch(e) {
+    console.warn('Firestore auth path failed, check rules:', e.message);
+    showToast('⚠️ Firestore izin hatası - rules kontrol edin');
+  }
+}
+
 function subscribe() {
   setSync('saving');
+  testAndInitFirestore();
 
   // Projects listener
   unsub = prjCol().onSnapshot(snap => {
@@ -827,9 +838,15 @@ async function toggleCheck(sid, iid) {
     await logAct(newVal?'check':'uncheck',(newVal?'Tamamladı: ':'Geri aldı: ')+item.title, p.name);
   } catch(e) {
     // rollback
-    projects[activePid].sections[sid].items[iid].checked=!newVal;
+    if(projects[activePid]?.sections?.[sid]?.items?.[iid]) {
+      projects[activePid].sections[sid].items[iid].checked=!newVal;
+    }
     renderSection(); renderChecklist();
-    showToast('Kaydetme hatası');
+    const msg = e.code==='permission-denied' ? 
+      'İzin hatası — Firebase Rules kontrol edin' : 
+      'Kaydetme hatası: '+e.message;
+    showToast(msg);
+    console.error('toggleCheck error:', e);
   }
 }
 
@@ -893,11 +910,17 @@ async function handlePhoto(sid,iid,input) {
       };
       img.onerror=rej; img.src=url;
     });
-    // Upload to Firebase Storage
-    const path=`photos/${me.uid}/${activePid}/${sid}/${iid}/${uid()}.jpg`;
-    const ref=storage.ref(path);
-    await ref.putString(dataUrl,'data_url');
-    const url=await ref.getDownloadURL();
+    // Önce Storage dene, hata olursa base64 olarak Firestore'a kaydet
+    let url = dataUrl; // fallback: base64
+    try {
+      const path=`photos/${me.uid}/${activePid}/${sid}/${iid}/${uid()}.jpg`;
+      const ref=storage.ref(path);
+      await ref.putString(dataUrl,'data_url');
+      url=await ref.getDownloadURL();
+    } catch(storageErr) {
+      console.warn('Storage failed, using base64 fallback:', storageErr.message);
+      // base64 olarak devam et (url zaten dataUrl)
+    }
     await prjCol().doc(activePid).update({
       [`sections.${sid}.items.${iid}.photos`]:firebase.firestore.FieldValue.arrayUnion(url)
     });
