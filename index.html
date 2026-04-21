@@ -2,788 +2,1066 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="StudioHDA">
-<title>StudioHDA Protokol</title>
+<title>StudioHDA</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+html,body{width:100%;max-width:100%;overflow-x:hidden;height:100%}
 :root{
-  --cream:#EDEAE3;--cream2:#E5E0D7;--dark:#2C2A25;--mid:#4A4740;--light:#7A766D;
-  --rule:#9A9186;--faint:#C8C3BB;--white:#F9F7F3;
-  --green:#639922;--green-bg:#EAF3DE;--red:#c0392b;--red-bg:#fdf0ee;
-  --radius:14px;--radius-sm:8px;
+  --cr:#EDEAE3;--cr2:#E5E0D7;--dk:#2C2A25;--md:#4A4740;--lt:#7A766D;
+  --rl:#9A9186;--ft:#C8C3BB;--wh:#F9F7F3;
+  --gr:#3A7D0A;--gr-bg:#EAF3DE;
+  --am:#B8700A;--am-bg:#FEF3E2;
+  --rd:#B91C1C;--rd-bg:#FEE2E2;
+  --bl:#1D4ED8;--bl-bg:#EFF6FF;
+  --r:14px;--rs:10px;
+  --tab-h:calc(56px + env(safe-area-inset-bottom));
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;background:var(--cr);color:var(--dk);overflow-x:hidden}
+
+/* ── LOADING ── */
+#loadWrap{position:fixed;inset:0;background:var(--cr);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:9999;transition:opacity .3s}
+#loadWrap.out{opacity:0;pointer-events:none}
+.load-logo{font-size:30px;font-weight:700;letter-spacing:.06em;color:var(--dk)}
+.load-logo b{font-weight:300;color:var(--lt)}
+.dots{display:flex;gap:6px}
+.dots span{width:7px;height:7px;border-radius:50%;background:var(--rl);animation:dot 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{opacity:.2}40%{opacity:1}}
+
+/* ── LOGIN ── */
+#loginWrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100svh;padding:40px 24px;gap:28px;background:var(--cr)}
+.lg-logo{font-size:34px;font-weight:700;letter-spacing:.06em;color:var(--dk)}
+.lg-logo span{font-weight:300;color:var(--lt)}
+.lg-tag{font-size:11px;color:var(--lt);letter-spacing:.1em;margin-top:5px;text-align:center}
+.card{background:var(--wh);border-radius:var(--r);border:.5px solid var(--ft);padding:28px 22px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px}
+.card h2{font-size:18px;font-weight:600;color:var(--dk)}
+.inp{width:100%;padding:13px 15px;border:.5px solid var(--ft);border-radius:var(--rs);background:var(--cr);color:var(--dk);font-size:16px;outline:none;font-family:inherit;-webkit-appearance:none;appearance:none}
+.inp:focus{border-color:var(--rl);background:var(--wh)}
+.inp-label{font-size:12px;font-weight:500;color:var(--md);margin-bottom:4px}
+.inp-group{display:flex;flex-direction:column}
+.btn{padding:14px;border:none;border-radius:var(--rs);font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .1s}
+.btn:active{opacity:.85;transform:scale(.98)}
+.btn-dark{background:var(--dk);color:var(--cr);width:100%}
+.btn-light{background:transparent;color:var(--md);border:.5px solid var(--ft);width:100%}
+.btn-sm{padding:8px 16px;font-size:13px;font-weight:500}
+.btn-danger{background:var(--rd-bg);color:var(--rd);border:.5px solid #fca5a5}
+.btn-green{background:var(--gr-bg);color:var(--gr);border:.5px solid #86efac}
+.err{font-size:13px;color:var(--rd);text-align:center;display:none;padding:8px;background:var(--rd-bg);border-radius:var(--rs)}
+.note-txt{font-size:12px;color:var(--lt);text-align:center}
+
+/* ── APP SHELL ── */
+#appWrap{display:none;flex-direction:column;min-height:100svh}
+#appWrap.show{display:flex}
 
 /* TOP BAR */
-.top-bar{position:sticky;top:0;z-index:100;background:var(--cream);border-bottom:0.5px solid var(--faint);padding:12px 20px 10px;display:flex;align-items:center;justify-content:space-between}
-.logo-text{font-size:13px;font-weight:600;letter-spacing:0.08em;color:var(--dark)}
-.logo-sub{font-size:10px;color:var(--light);letter-spacing:0.04em}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block;margin-left:6px;vertical-align:middle;transition:background 0.3s}
-.sync-dot.live{background:var(--green)}
-.sync-dot.saving{background:#F5A623;animation:pulse 0.8s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-.user-btn{width:34px;height:34px;border-radius:50%;background:var(--dark);color:var(--cream);font-size:12px;font-weight:600;border:none;cursor:pointer}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(237,234,227,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:.5px solid var(--ft);padding:12px 20px 10px;display:flex;align-items:center;justify-content:space-between;padding-top:calc(12px + env(safe-area-inset-top))}
+.topbar-left h1{font-size:14px;font-weight:700;letter-spacing:.06em;color:var(--dk)}
+.topbar-left p{font-size:11px;color:var(--lt);margin-top:1px}
+.sync-wrap{display:flex;align-items:center;gap:6px}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--ft);transition:background .3s}
+.sdot.live{background:var(--gr)}
+.sdot.saving{background:var(--am);animation:pulse .8s infinite}
+.sdot.err{background:var(--rd)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-lbl{font-size:10px;color:var(--lt)}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--dk);color:var(--cr);font-size:12px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
 /* SCREENS */
-.screen{display:none}
-.screen.active{display:block}
-.hidden{display:none!important}
-
-/* LOGIN */
-.login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 32px;gap:24px;background:var(--cream)}
-.login-logo{font-size:32px;font-weight:700;letter-spacing:0.06em;color:var(--dark)}
-.login-logo span{font-weight:300;color:var(--light)}
-.login-tagline{font-size:11px;color:var(--light);letter-spacing:0.1em;margin-top:4px}
-.login-card{background:var(--white);border-radius:var(--radius);border:0.5px solid var(--faint);padding:28px 24px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px}
-.login-card h2{font-size:17px;font-weight:600;color:var(--dark)}
-.inp{width:100%;padding:12px 14px;border:0.5px solid var(--faint);border-radius:var(--radius-sm);background:var(--cream);color:var(--dark);font-size:15px;outline:none;font-family:inherit}
-.inp:focus{border-color:var(--rule)}
-.btn-primary{width:100%;padding:14px;background:var(--dark);color:var(--cream);border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
-.btn-primary:disabled{opacity:0.5}
-.btn-secondary{width:100%;padding:13px;background:transparent;color:var(--mid);border:0.5px solid var(--faint);border-radius:var(--radius-sm);font-size:14px;cursor:pointer;font-family:inherit}
-.err-msg{font-size:13px;color:var(--red);text-align:center;display:none}
-.login-note{font-size:12px;color:var(--light);text-align:center}
-
-/* PROJECTS SCREEN */
-.page-header{padding:20px 20px 0}
-.page-header h2{font-size:20px;font-weight:700;color:var(--dark)}
-.page-header p{font-size:13px;color:var(--light);margin-top:4px}
-
-.project-grid{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
-.project-card{background:var(--white);border-radius:var(--radius);border:0.5px solid var(--faint);padding:16px;cursor:pointer;transition:border-color 0.15s}
-.project-card:active{border-color:var(--rule)}
-.proj-top{display:flex;justify-content:space-between;align-items:flex-start}
-.proj-name{font-size:16px;font-weight:600;color:var(--dark)}
-.proj-pct{font-size:20px;font-weight:700;color:var(--dark)}
-.proj-pct.done{color:var(--green)}
-.proj-meta{font-size:12px;color:var(--light);margin-top:3px;display:flex;flex-direction:column;gap:2px}
-.proj-bar{height:3px;background:var(--cream2);border-radius:2px;margin-top:10px}
-.proj-fill{height:3px;background:var(--rule);border-radius:2px;transition:width 0.3s}
-.proj-fill.done{background:var(--green)}
-.proj-count{font-size:12px;color:var(--light);margin-top:5px}
-
-.add-btn{display:flex;align-items:center;gap:10px;padding:14px 20px;border:1px dashed var(--faint);border-radius:var(--radius);cursor:pointer;color:var(--light);font-size:14px;margin:0 20px 20px;background:transparent;width:calc(100% - 40px);font-family:inherit}
-
-/* CHECKLIST SCREEN */
-.detail-header{padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid var(--faint);background:var(--cream);position:sticky;top:52px;z-index:50}
-.back-btn{font-size:22px;color:var(--mid);background:none;border:none;cursor:pointer;padding:0 8px 0 0}
-.detail-title{font-size:14px;font-weight:600;color:var(--dark);flex:1;line-height:1.3}
-.detail-badge{font-size:13px;font-weight:600;padding:4px 10px;border-radius:20px;background:var(--cream2);color:var(--mid)}
-.detail-badge.done{background:var(--green-bg);color:var(--green)}
-
-/* OVERALL CARD */
-.overall-card{margin:16px 20px;background:var(--dark);border-radius:var(--radius);padding:20px;color:var(--cream)}
-.overall-label{font-size:11px;letter-spacing:0.08em;opacity:0.6;margin-bottom:6px}
-.overall-pct{font-size:40px;font-weight:700;line-height:1}
-.overall-bar{height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:14px}
-.overall-fill{height:4px;background:var(--cream);border-radius:2px;transition:width 0.4s}
-.overall-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;opacity:0.55}
-
-/* SECTION CARDS */
-.section-list{padding:0 20px 10px;display:flex;flex-direction:column;gap:10px}
-.section-card{background:var(--white);border-radius:var(--radius);border:0.5px solid var(--faint);padding:16px;cursor:pointer}
-.section-card:active{border-color:var(--rule)}
-.sec-top{display:flex;align-items:flex-start;justify-content:space-between}
-.sec-num{font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--light);margin-bottom:4px}
-.sec-title{font-size:15px;font-weight:600;color:var(--dark);line-height:1.3}
-.sec-pct{font-size:22px;font-weight:700;color:var(--dark)}
-.sec-pct.done{color:var(--green)}
-.sec-bar{height:3px;background:var(--cream2);border-radius:2px;margin-top:12px}
-.sec-fill{height:3px;background:var(--rule);border-radius:2px;transition:width 0.3s}
-.sec-fill.done{background:var(--green)}
-.sec-count{font-size:12px;color:var(--light);margin-top:6px}
-.sec-actions{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:0.5px solid var(--cream2)}
-.sec-del-btn{font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;padding:0;font-family:inherit}
-
-.add-section-btn{display:flex;align-items:center;gap:8px;padding:13px 20px;border:1px dashed var(--faint);border-radius:var(--radius);cursor:pointer;color:var(--light);font-size:13px;margin:0 20px;background:transparent;width:calc(100% - 40px);font-family:inherit}
-
-/* ITEMS */
-.item-list{padding:12px 20px;display:flex;flex-direction:column;gap:8px}
-.item-card{background:var(--white);border-radius:var(--radius-sm);border:0.5px solid var(--faint);overflow:hidden}
-.item-main{display:flex;align-items:flex-start;gap:12px;padding:14px}
-.check-circle{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--faint);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;margin-top:1px}
-.check-circle.checked{background:var(--dark);border-color:var(--dark)}
-.check-circle.checked::after{content:'';width:6px;height:11px;border:2px solid var(--cream);border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px);display:block}
-.item-content{flex:1;min-width:0}
-.item-title{font-size:14px;font-weight:600;color:var(--dark);line-height:1.3}
-.item-title.checked{color:var(--light);text-decoration:line-through}
-.item-desc{font-size:13px;color:var(--mid);line-height:1.5;margin-top:4px}
-.item-desc.checked{color:var(--faint)}
-.item-who{font-size:11px;color:var(--faint);margin-top:5px}
-.item-actions{display:flex;gap:8px;padding:0 14px 12px 52px}
-.action-btn{font-size:12px;color:var(--light);background:var(--cream);border:0.5px solid var(--faint);border-radius:20px;padding:5px 12px;cursor:pointer}
-.item-extras{border-top:0.5px solid var(--cream2)}
-.note-area{width:100%;padding:10px 14px;border:none;background:transparent;font-size:13px;color:var(--mid);resize:none;font-family:inherit;outline:none;min-height:60px}
-.photo-strip{display:flex;gap:8px;padding:10px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.photo-thumb{width:72px;height:72px;border-radius:var(--radius-sm);object-fit:cover;flex-shrink:0;border:0.5px solid var(--faint)}
-.photo-add{width:72px;height:72px;border-radius:var(--radius-sm);border:1px dashed var(--faint);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;font-size:26px;color:var(--faint)}
-.hidden-input{display:none}
-
-.add-item-btn{display:flex;align-items:center;gap:8px;padding:13px 20px;border:1px dashed var(--faint);border-radius:var(--radius-sm);cursor:pointer;color:var(--light);font-size:13px;margin:0 20px 12px;background:transparent;width:calc(100% - 40px);font-family:inherit}
-
-/* ACTIVITY */
-.activity-list{padding:0 20px;display:flex;flex-direction:column;gap:8px}
-.activity-item{background:var(--white);border-radius:var(--radius-sm);border:0.5px solid var(--faint);padding:12px 14px}
-.act-user{font-size:12px;font-weight:600;color:var(--dark)}
-.act-action{font-size:13px;color:var(--mid);margin-top:2px}
-.act-time{font-size:11px;color:var(--faint);margin-top:4px}
-.act-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
-.act-dot.check{background:var(--green)}
-.act-dot.note{background:#9A9186}
-.act-dot.photo{background:#4A90E2}
-.empty-state{text-align:center;padding:40px 20px;color:var(--light);font-size:14px}
+.screen{display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:var(--tab-h)}
+.screen.on{display:block}
 
 /* TAB BAR */
-.tab-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(237,234,227,0.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:0.5px solid var(--faint);display:flex;padding:8px 0;padding-bottom:calc(8px + env(safe-area-inset-bottom))}
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0}
-.tab-icon{font-size:20px;line-height:1}
-.tab-label{font-size:10px;color:var(--light)}
-.tab-item.active .tab-label{color:var(--dark);font-weight:600}
-.tab-spacer{height:80px}
+.tabbar{position:fixed;bottom:0;left:0;right:0;background:rgba(237,234,227,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:.5px solid var(--ft);display:flex;height:var(--tab-h);align-items:flex-start;padding-top:8px;z-index:100}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;min-height:44px;justify-content:center}
+.tab-ic{font-size:22px;line-height:1;transition:transform .15s}
+.tab-lb{font-size:10px;color:var(--lt);transition:color .15s}
+.tab.on .tab-lb{color:var(--dk);font-weight:600}
+.tab.on .tab-ic{transform:scale(1.1)}
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:flex;align-items:flex-end;justify-content:center}
-.modal-sheet{background:var(--cream);border-radius:20px 20px 0 0;padding:24px 20px;width:100%;max-width:480px;display:flex;flex-direction:column;gap:14px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
-.modal-title{font-size:17px;font-weight:600;color:var(--dark)}
-.modal-actions{display:flex;gap:10px;margin-top:4px}
-.modal-actions .btn-primary{flex:1;padding:12px}
-.modal-actions .btn-secondary{flex:1;padding:12px}
+/* ── PROJECTS ── */
+.ph{padding:20px 20px 0}
+.ph h2{font-size:22px;font-weight:700;color:var(--dk)}
+.ph p{font-size:13px;color:var(--lt);margin-top:4px}
+.proj-grid{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.proj-card{background:var(--wh);border-radius:var(--r);border:.5px solid var(--ft);padding:18px;cursor:pointer;transition:border-color .15s,transform .1s;position:relative}
+.proj-card:active{transform:scale(.99);border-color:var(--rl)}
+.proj-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.proj-name{font-size:16px;font-weight:700;color:var(--dk);line-height:1.3}
+.proj-meta{margin-top:6px;display:flex;flex-direction:column;gap:3px}
+.proj-meta-row{font-size:12px;color:var(--lt);display:flex;align-items:center;gap:5px}
+.proj-pct{font-size:26px;font-weight:700;color:var(--dk);flex-shrink:0;line-height:1}
+.proj-pct.done{color:var(--gr)}
+.proj-pct.active{color:var(--am)}
+.pbar{height:4px;background:var(--cr2);border-radius:2px;margin-top:12px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.pbar-fill.done{background:var(--gr)}
+.pbar-fill.active{background:var(--am)}
+.pbar-fill.empty{background:var(--ft)}
+.proj-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.proj-stat{font-size:12px;color:var(--lt)}
+.proj-actions{display:flex;gap:6px}
+.icon-btn{width:32px;height:32px;border-radius:8px;border:.5px solid var(--ft);background:var(--cr);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;flex-shrink:0}
+.icon-btn:active{opacity:.7}
+.add-row{display:flex;align-items:center;gap:10px;padding:14px 20px;border:1.5px dashed var(--ft);border-radius:var(--r);cursor:pointer;color:var(--lt);font-size:14px;margin:0 20px 20px;background:transparent;width:calc(100% - 40px);font-family:inherit;min-height:52px}
+.add-row:active{border-color:var(--rl);color:var(--rl)}
+.add-ic{font-size:22px;line-height:1}
 
-/* TOAST */
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--dark);color:var(--cream);padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:opacity 0.3s;z-index:999;white-space:nowrap}
-.toast.show{opacity:1}
+/* ── CHECKLIST ── */
+.subheader{padding:12px 20px;display:flex;align-items:center;gap:10px;border-bottom:.5px solid var(--ft);background:rgba(237,234,227,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);position:sticky;top:0;z-index:50}
+.back-btn{min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;font-size:24px;color:var(--md);margin-left:-10px}
+.sub-title{font-size:15px;font-weight:700;color:var(--dk);flex:1;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{font-size:13px;font-weight:700;padding:5px 11px;border-radius:20px;flex-shrink:0}
+.badge.pend{background:var(--cr2);color:var(--md)}
+.badge.prog{background:var(--am-bg);color:var(--am)}
+.badge.done{background:var(--gr-bg);color:var(--gr)}
 
-/* LOADING */
-.loading-overlay{position:fixed;inset:0;background:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999}
-.loading-logo{font-size:28px;font-weight:700;color:var(--dark);letter-spacing:0.06em}
-.loading-dots{display:flex;gap:6px}
-.loading-dots span{width:6px;height:6px;border-radius:50%;background:var(--rule);animation:dot 1.2s infinite}
-.loading-dots span:nth-child(2){animation-delay:0.2s}
-.loading-dots span:nth-child(3){animation-delay:0.4s}
-@keyframes dot{0%,80%,100%{opacity:0.2}40%{opacity:1}}
+.summary-card{margin:16px 20px;background:var(--dk);border-radius:var(--r);padding:20px;color:var(--cr)}
+.sum-label{font-size:11px;letter-spacing:.08em;opacity:.6;margin-bottom:8px;font-weight:600}
+.sum-pct{font-size:44px;font-weight:700;line-height:1}
+.sum-bar{height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin-top:14px;overflow:hidden}
+.sum-fill{height:100%;background:var(--cr);border-radius:2px;transition:width .4s ease}
+.sum-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;opacity:.55}
+.sum-status{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.status-pill{font-size:11px;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.8)}
+
+.sec-list{padding:0 20px 12px;display:flex;flex-direction:column;gap:10px}
+.sec-card{background:var(--wh);border-radius:var(--r);border:.5px solid var(--ft);overflow:hidden}
+.sec-head{padding:16px;cursor:pointer;display:flex;align-items:flex-start;gap:12px}
+.sec-head:active{background:var(--cr)}
+.sec-num{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--lt);margin-bottom:3px}
+.sec-title{font-size:15px;font-weight:600;color:var(--dk);line-height:1.3}
+.sec-right{text-align:right;flex-shrink:0}
+.sec-pct{font-size:22px;font-weight:700;color:var(--dk)}
+.sec-pct.done{color:var(--gr)}
+.sec-pct.prog{color:var(--am)}
+.sec-bar{height:3px;background:var(--cr2);margin-top:3px;overflow:hidden;border-radius:2px}
+.sec-bar-fill{height:100%;border-radius:2px;transition:width .3s}
+.sec-fill-done{background:var(--gr)}
+.sec-fill-prog{background:var(--am)}
+.sec-fill-empty{background:var(--ft)}
+.sec-stat{font-size:11px;color:var(--lt);padding:0 16px 10px;display:flex;justify-content:space-between;align-items:center}
+.sec-del{font-size:12px;color:var(--rd);background:none;border:none;cursor:pointer;padding:4px 0;font-family:inherit;min-height:32px}
+
+/* ── SECTION ITEMS ── */
+.item-list{padding:12px 20px;display:flex;flex-direction:column;gap:8px}
+.item-card{background:var(--wh);border-radius:var(--rs);border:.5px solid var(--ft);overflow:hidden;transition:border-color .2s}
+.item-card.checked{border-color:rgba(58,125,10,.3);background:#f7fbf3}
+.item-main{display:flex;align-items:flex-start;gap:12px;padding:14px 14px 10px}
+.chk{width:44px;height:44px;border-radius:50%;border:2px solid var(--ft);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;margin-top:-4px;margin-left:-4px;background:transparent}
+.chk.on{background:var(--dk);border-color:var(--dk)}
+.chk.on::after{content:'';width:7px;height:12px;border:2.5px solid var(--cr);border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px);display:block}
+.item-body{flex:1;min-width:0;padding-top:2px}
+.item-title{font-size:14px;font-weight:600;color:var(--dk);line-height:1.4}
+.item-title.on{color:var(--lt);text-decoration:line-through;text-decoration-color:var(--ft)}
+.item-desc{font-size:13px;color:var(--md);line-height:1.5;margin-top:3px}
+.item-desc.on{color:var(--ft)}
+.item-who{font-size:11px;color:var(--gr);margin-top:5px;font-weight:500}
+.item-del{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;font-size:18px;color:var(--ft);flex-shrink:0;border-radius:8px}
+.item-del:active{color:var(--rd);background:var(--rd-bg)}
+.item-btns{display:flex;gap:6px;padding:0 14px 12px 50px}
+.act-btn{font-size:12px;color:var(--lt);background:var(--cr);border:.5px solid var(--ft);border-radius:20px;padding:6px 13px;cursor:pointer;min-height:32px;font-family:inherit}
+.act-btn:active{background:var(--cr2)}
+.item-extra{border-top:.5px solid var(--cr2)}
+.note-ta{width:100%;padding:12px 15px;border:none;background:transparent;font-size:13px;color:var(--md);resize:none;font-family:inherit;outline:none;min-height:70px;line-height:1.5}
+.photo-row{display:flex;gap:8px;padding:10px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.photo-row::-webkit-scrollbar{display:none}
+.ph-thumb{width:76px;height:76px;border-radius:var(--rs);object-fit:cover;flex-shrink:0;border:.5px solid var(--ft);cursor:pointer;transition:opacity .15s}
+.ph-thumb:active{opacity:.8}
+.ph-add{width:76px;height:76px;border-radius:var(--rs);border:1.5px dashed var(--ft);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;font-size:28px;color:var(--ft);min-width:76px}
+.ph-add:active{border-color:var(--rl);color:var(--rl)}
+.file-inp{display:none}
+
+/* ── ACTIVITY ── */
+.act-list{padding:0 20px;display:flex;flex-direction:column;gap:8px}
+.act-item{background:var(--wh);border-radius:var(--rs);border:.5px solid var(--ft);padding:13px 15px}
+.act-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.act-dot.check{background:var(--gr)}
+.act-dot.uncheck{background:var(--ft)}
+.act-dot.note{background:var(--rl)}
+.act-dot.photo{background:var(--bl)}
+.act-user{font-size:13px;font-weight:600;color:var(--dk)}
+.act-desc{font-size:13px;color:var(--md)}
+.act-time{font-size:11px;color:var(--ft);margin-top:3px}
+.act-proj{font-size:11px;color:var(--lt)}
+.empty{text-align:center;padding:48px 20px;color:var(--lt);font-size:14px;line-height:1.7}
+.empty-ic{font-size:40px;margin-bottom:12px}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s;pointer-events:none}
+.modal-bg.show{opacity:1;pointer-events:all}
+.modal-sheet{background:var(--cr);border-radius:22px 22px 0 0;padding:24px 20px;width:100%;max-width:500px;display:flex;flex-direction:column;gap:14px;padding-bottom:calc(24px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .25s cubic-bezier(.32,.72,0,1)}
+.modal-bg.show .modal-sheet{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;background:var(--ft);border-radius:2px;margin:0 auto -4px}
+.modal-title{font-size:18px;font-weight:700;color:var(--dk)}
+.modal-btns{display:flex;gap:10px;margin-top:4px}
+.modal-btns .btn{flex:1;padding:13px}
+
+/* ── LIGHTBOX ── */
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;pointer-events:none}
+.lb.show{opacity:1;pointer-events:all}
+.lb img{max-width:96vw;max-height:88vh;object-fit:contain;border-radius:8px;user-select:none}
+.lb-close{position:absolute;top:calc(16px + env(safe-area-inset-top));right:20px;color:#fff;font-size:28px;cursor:pointer;background:rgba(255,255,255,.15);border:none;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--tab-h) + 12px);left:50%;transform:translateX(-50%) translateY(10px);background:var(--dk);color:var(--cr);padding:11px 22px;border-radius:22px;font-size:13px;font-weight:500;opacity:0;transition:opacity .25s,transform .25s;z-index:400;white-space:nowrap;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.undo-toast{display:flex;align-items:center;gap:12px}
+.toast-undo-btn{font-size:13px;font-weight:700;color:#93c5fd;background:none;border:none;cursor:pointer;padding:0;font-family:inherit;pointer-events:all}
+
+/* ── OFFLINE BANNER ── */
+.offline-bar{background:var(--rd-bg);border-bottom:.5px solid #fca5a5;padding:8px 20px;font-size:12px;color:var(--rd);display:none;text-align:center;font-weight:500}
+.offline-bar.show{display:block}
 </style>
 </head>
 <body>
 
 <!-- LOADING -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-logo">studio<span style="font-weight:300;color:var(--light)">hda</span></div>
-  <div class="loading-dots"><span></span><span></span><span></span></div>
+<div id="loadWrap">
+  <div class="load-logo">studio<b>hda</b></div>
+  <div class="dots"><span></span><span></span><span></span></div>
 </div>
 
+<!-- OFFLINE BANNER -->
+<div class="offline-bar" id="offlineBanner">📡 İnternet bağlantısı yok — veriler çevrimdışı kaydediliyor</div>
+
 <!-- LOGIN -->
-<div id="loginScreen" class="login-screen hidden">
-  <div style="text-align:center">
-    <div class="login-logo">studio<span>hda</span></div>
-    <div class="login-tagline">MİMARLIK & MÜHENDİSLİK & İNŞAAT A.Ş.</div>
+<div id="loginWrap" style="display:none">
+  <div>
+    <div class="lg-logo">studio<span>hda</span></div>
+    <div class="lg-tag">MİMARLIK & MÜHENDİSLİK & İNŞAAT A.Ş.</div>
   </div>
-  <div class="login-card">
+  <div class="card">
     <h2>Giriş Yap</h2>
-    <input class="inp" id="loginEmail" type="email" placeholder="E-posta" autocomplete="email">
-    <input class="inp" id="loginPass" type="password" placeholder="Şifre" autocomplete="current-password">
-    <div class="err-msg" id="loginErr">E-posta veya şifre hatalı</div>
-    <button class="btn-primary" id="loginBtn" onclick="doLogin()">Giriş Yap</button>
-    <p class="login-note">Tüm veriler anlık senkronize edilir</p>
+    <div class="inp-group">
+      <div class="inp-label">E-Posta</div>
+      <input class="inp" id="lgEmail" type="email" placeholder="ornek@email.com" autocomplete="email" inputmode="email">
+    </div>
+    <div class="inp-group">
+      <div class="inp-label">Şifre</div>
+      <input class="inp" id="lgPass" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="err" id="lgErr"></div>
+    <button class="btn btn-dark" id="lgBtn" onclick="doLogin()">Giriş Yap</button>
+    <p class="note-txt">Tüm veriler Firebase ile şifreli senkronize edilir</p>
   </div>
 </div>
 
 <!-- APP -->
-<div id="appWrapper" class="hidden">
-
-<div class="top-bar">
-  <div>
-    <div class="logo-text">STUDİO HDA <span class="sync-dot" id="syncDot"></span></div>
-    <div class="logo-sub" id="syncLabel">bağlanıyor...</div>
+<div id="appWrap">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>STUDİO HDA</h1>
+      <div class="sync-wrap">
+        <div class="sdot" id="sdot"></div>
+        <span class="sync-lbl" id="slbl">bağlanıyor</span>
+      </div>
+    </div>
+    <div class="avatar" id="avt" onclick="doLogout()">--</div>
   </div>
-  <button class="user-btn" id="userInitials" onclick="doLogout()">--</button>
-</div>
 
-<!-- SCREEN: PROJECTS -->
-<div id="screenProjects" class="screen active">
-  <div class="page-header">
-    <h2>Projeler</h2>
-    <p>Aktif şantiye projeleriniz</p>
+  <!-- SCREEN: PROJECTS -->
+  <div class="screen on" id="sPrj">
+    <div class="ph"><h2>Projeler</h2><p id="prjSubtitle">Yükleniyor...</p></div>
+    <div class="proj-grid" id="prjGrid"></div>
+    <button class="add-row" onclick="openModal('project')">
+      <span class="add-ic">＋</span> Yeni Proje Ekle
+    </button>
   </div>
-  <div class="project-grid" id="projectGrid"></div>
-  <button class="add-btn" onclick="showAddProject()">
-    <span style="font-size:22px">+</span> Yeni Proje Ekle
-  </button>
-  <div class="tab-spacer"></div>
-</div>
 
-<!-- SCREEN: CHECKLIST -->
-<div id="screenChecklist" class="screen">
-  <div class="detail-header">
-    <button class="back-btn" onclick="goToProjects()">‹</button>
-    <div class="detail-title" id="checklistTitle">Proje</div>
-    <div class="detail-badge" id="checklistBadge">0%</div>
+  <!-- SCREEN: CHECKLIST -->
+  <div class="screen" id="sChk">
+    <div class="subheader">
+      <button class="back-btn" onclick="navBack()">‹</button>
+      <div class="sub-title" id="chkTitle">Proje</div>
+      <div class="badge pend" id="chkBadge">0%</div>
+    </div>
+    <div class="summary-card" id="sumCard">
+      <div class="sum-label">GENEL İLERLEME</div>
+      <div class="sum-pct" id="sumPct">0%</div>
+      <div class="sum-bar"><div class="sum-fill" id="sumFill" style="width:0%"></div></div>
+      <div class="sum-meta">
+        <span id="sumDone">0 tamamlandı</span>
+        <span id="sumTotal">0 toplam</span>
+      </div>
+      <div class="sum-status" id="sumStatus"></div>
+    </div>
+    <div class="sec-list" id="secList"></div>
+    <button class="add-row" onclick="openModal('section')" style="margin-top:4px">
+      <span class="add-ic">＋</span> Yeni Bölüm Ekle
+    </button>
   </div>
-  <div class="overall-card">
-    <div class="overall-label">GENEL İLERLEME</div>
-    <div class="overall-pct" id="overallPct">0%</div>
-    <div class="overall-bar"><div class="overall-fill" id="overallFill" style="width:0%"></div></div>
-    <div class="overall-meta">
-      <span id="overallDone">0 tamamlandı</span>
-      <span id="overallTotal">0 toplam</span>
+
+  <!-- SCREEN: SECTION -->
+  <div class="screen" id="sSec">
+    <div class="subheader">
+      <button class="back-btn" onclick="navBack()">‹</button>
+      <div class="sub-title" id="secTitle">Bölüm</div>
+      <div class="badge pend" id="secBadge">0%</div>
+    </div>
+    <div class="item-list" id="itemList"></div>
+    <button class="add-row" onclick="openModal('item')" style="margin:0 20px 12px;width:calc(100% - 40px)">
+      <span class="add-ic">＋</span> Yeni Madde Ekle
+    </button>
+  </div>
+
+  <!-- SCREEN: ACTIVITY -->
+  <div class="screen" id="sAct">
+    <div class="ph" style="margin-bottom:16px"><h2>Ekip Aktivitesi</h2><p>Son 50 işlem</p></div>
+    <div class="act-list" id="actList">
+      <div class="empty"><div class="empty-ic">📋</div>Henüz aktivite yok</div>
     </div>
   </div>
-  <div class="section-list" id="sectionList"></div>
-  <button class="add-section-btn" onclick="showAddSection()">
-    <span style="font-size:18px">+</span> Yeni Bölüm Ekle
-  </button>
-  <div class="tab-spacer"></div>
-</div>
 
-<!-- SCREEN: SECTION DETAIL -->
-<div id="screenSection" class="screen">
-  <div class="detail-header">
-    <button class="back-btn" onclick="goToChecklist()">‹</button>
-    <div class="detail-title" id="sectionTitle">Bölüm</div>
-    <div class="detail-badge" id="sectionBadge">0%</div>
-  </div>
-  <div class="item-list" id="itemList"></div>
-  <button class="add-item-btn" onclick="showAddItem()">
-    <span style="font-size:18px">+</span> Yeni Madde Ekle
-  </button>
-  <div class="tab-spacer"></div>
-</div>
-
-<!-- SCREEN: ACTIVITY -->
-<div id="screenActivity" class="screen">
-  <div class="page-header">
-    <h2>Ekip Aktivitesi</h2>
-    <p>Son yapılan değişiklikler</p>
-  </div>
-  <div style="height:16px"></div>
-  <div class="activity-list" id="activityList">
-    <div class="empty-state">Henüz aktivite yok</div>
-  </div>
-  <div class="tab-spacer"></div>
-</div>
-
-<!-- TAB BAR -->
-<div class="tab-bar">
-  <div class="tab-item active" id="tab-projects" onclick="switchTab('projects')">
-    <span class="tab-icon">⊞</span>
-    <span class="tab-label">Projeler</span>
-  </div>
-  <div class="tab-item" id="tab-activity" onclick="switchTab('activity')">
-    <span class="tab-icon">◎</span>
-    <span class="tab-label">Aktivite</span>
+  <!-- TAB BAR -->
+  <div class="tabbar">
+    <div class="tab on" id="tPrj" onclick="switchTab('prj')">
+      <span class="tab-ic">⊞</span>
+      <span class="tab-lb">Projeler</span>
+    </div>
+    <div class="tab" id="tAct" onclick="switchTab('act')">
+      <span class="tab-ic">◎</span>
+      <span class="tab-lb">Aktivite</span>
+    </div>
   </div>
 </div>
 
-</div><!-- /appWrapper -->
-
-<!-- MODALS -->
-<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal(event)">
-  <div class="modal-sheet" onclick="event.stopPropagation()">
-    <div class="modal-title" id="modalTitle">Yeni Proje</div>
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg" onclick="bgClose(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle"></div>
     <div id="modalBody"></div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModalDirect()">İptal</button>
-      <button class="btn-primary" id="modalSaveBtn" onclick="modalSave()">Kaydet</button>
+    <div class="modal-btns">
+      <button class="btn btn-light" onclick="closeModal()">İptal</button>
+      <button class="btn btn-dark" onclick="modalSave()" id="modalSaveBtn">Kaydet</button>
     </div>
   </div>
 </div>
 
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" onclick="closeLb()">
+  <button class="lb-close" onclick="closeLb()">✕</button>
+  <img id="lbImg" src="" alt="">
+</div>
+
+<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCvkt_el-uPO6KHIjWiSubppBFhBnva6qA",
-  authDomain: "studiohda-banyo.firebaseapp.com",
-  projectId: "studiohda-banyo",
-  storageBucket: "studiohda-banyo.firebasestorage.app",
-  messagingSenderId: "140999098295",
-  appId: "1:140999098295:web:2fe8a1ce590e75a4263232"
-};
-
-firebase.initializeApp(firebaseConfig);
+/* ══════════════════════════════════════
+   FIREBASE INIT
+══════════════════════════════════════ */
+const FB = firebase.initializeApp({
+  apiKey:"AIzaSyCvkt_el-uPO6KHIjWiSubppBFhBnva6qA",
+  authDomain:"studiohda-banyo.firebaseapp.com",
+  projectId:"studiohda-banyo",
+  storageBucket:"studiohda-banyo.firebasestorage.app",
+  messagingSenderId:"140999098295",
+  appId:"1:140999098295:web:2fe8a1ce590e75a4263232"
+});
 const auth = firebase.auth();
 const db = firebase.firestore();
+const storage = firebase.storage();
 
-/* ── STATE ── */
-let currentUser = null;
-let allData = {};        // { projects:{}, activity:[] }
-let unsub = null;
-let activeProjectId = null;
-let activeSectionId = null;
-let modalMode = null;    // 'addProject' | 'addSection' | 'addItem' | 'editProject'
+// Offline persistence
+db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
 
-/* ── HELPERS ── */
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-function setSync(s) {
-  const dot = document.getElementById('syncDot');
-  const lbl = document.getElementById('syncLabel');
-  if (s==='live'){dot.className='sync-dot live';lbl.textContent='Canlı senkronize';}
-  else if(s==='saving'){dot.className='sync-dot saving';lbl.textContent='Kaydediliyor...';}
-  else{dot.className='sync-dot';lbl.textContent='Bağlantı yok';}
-}
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+let me = null;           // current user
+let unsub = null;        // firestore listener
+let projects = {};       // { [pid]: project }
+let activity = [];       // activity log
+let activePid = null;    // active project id
+let activeSid = null;    // active section id
+let modalMode = null;    // current modal type
+let navStack = [];       // screen nav history
+let undoTimer = null;    // undo timeout
+let pendingUndo = null;  // pending undo action
+
+/* ══════════════════════════════════════
+   HELPERS
+══════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const me_name = () => me?.email?.split('@')[0] || '?';
+
 function timeAgo(ts) {
   if (!ts) return '';
-  const d = ts.toDate ? ts.toDate() : new Date(ts);
-  const diff = Math.floor((Date.now()-d)/1000);
-  if (diff<60) return 'az önce';
-  if (diff<3600) return Math.floor(diff/60)+' dk önce';
-  if (diff<86400) return Math.floor(diff/3600)+' sa önce';
-  return Math.floor(diff/86400)+' gün önce';
+  const ms = typeof ts === 'number' ? ts : (ts.toMillis ? ts.toMillis() : +new Date(ts));
+  const d = Math.floor((Date.now()-ms)/1000);
+  if (d<5) return 'şimdi';
+  if (d<60) return d+'sn önce';
+  if (d<3600) return Math.floor(d/60)+'dk önce';
+  if (d<86400) return Math.floor(d/3600)+'sa önce';
+  return Math.floor(d/86400)+'g önce';
 }
-function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
 
-/* ── AUTH ── */
+function setSync(s) {
+  const dot=$('sdot'), lbl=$('slbl');
+  dot.className='sdot '+(s==='live'?'live':s==='saving'?'saving':'err');
+  lbl.textContent=s==='live'?'canlı':s==='saving'?'kaydediliyor':'bağlantı yok';
+}
+
+let toastTimer=null;
+function showToast(msg,undo=null) {
+  const t=$('toast');
+  clearTimeout(toastTimer);
+  if(undo) {
+    t.className='toast undo-toast';
+    t.innerHTML=`<span>${esc(msg)}</span><button class="toast-undo-btn" onclick="doUndo()">GERİ AL</button>`;
+    pendingUndo=undo;
+  } else {
+    t.className='toast';
+    t.textContent=msg;
+    pendingUndo=null;
+  }
+  t.classList.add('show');
+  toastTimer=setTimeout(()=>{t.classList.remove('show');pendingUndo=null;},undo?5000:2500);
+}
+
+function doUndo() {
+  if(!pendingUndo) return;
+  pendingUndo();
+  pendingUndo=null;
+  $('toast').classList.remove('show');
+  showToast('Geri alındı ✓');
+}
+
+/* ══════════════════════════════════════
+   NETWORK STATUS
+══════════════════════════════════════ */
+window.addEventListener('online', ()=>$('offlineBanner').classList.remove('show'));
+window.addEventListener('offline',()=>$('offlineBanner').classList.add('show'));
+
+/* ══════════════════════════════════════
+   AUTH
+══════════════════════════════════════ */
 auth.onAuthStateChanged(user => {
-  document.getElementById('loadingOverlay').classList.add('hidden');
-  if (user) {
-    currentUser = user;
-    const name = user.email.split('@')[0];
-    document.getElementById('userInitials').textContent = name.substring(0,2).toUpperCase();
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('appWrapper').classList.remove('hidden');
+  $('loadWrap').classList.add('out');
+  setTimeout(()=>$('loadWrap').style.display='none',350);
+
+  if(user) {
+    me = user;
+    const name = me_name();
+    $('avt').textContent = name.substring(0,2).toUpperCase();
+    $('loginWrap').style.display='none';
+    $('appWrap').classList.add('show');
     subscribe();
   } else {
-    if (unsub) { unsub(); unsub=null; }
-    document.getElementById('loginScreen').classList.remove('hidden');
-    document.getElementById('appWrapper').classList.add('hidden');
+    me = null;
+    if(unsub){unsub();unsub=null;}
+    $('loginWrap').style.display='flex';
+    $('appWrap').classList.remove('show');
   }
 });
 
 function doLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  const btn = document.getElementById('loginBtn');
-  const err = document.getElementById('loginErr');
-  if (!email||!pass){err.textContent='Tüm alanları doldurun';err.style.display='block';return;}
+  const email=$('lgEmail').value.trim();
+  const pass=$('lgPass').value;
+  const btn=$('lgBtn'), err=$('lgErr');
+  if(!email||!pass){showErr('Tüm alanları doldurun');return;}
   btn.disabled=true; btn.textContent='Giriş yapılıyor...'; err.style.display='none';
   auth.signInWithEmailAndPassword(email,pass)
-    .catch(e=>{err.textContent='E-posta veya şifre hatalı';err.style.display='block';btn.disabled=false;btn.textContent='Giriş Yap';});
+    .catch(e=>{
+      showErr(e.code==='auth/wrong-password'||e.code==='auth/user-not-found'?'E-posta veya şifre hatalı':'Bağlantı hatası, tekrar deneyin');
+      btn.disabled=false; btn.textContent='Giriş Yap';
+    });
 }
-function doLogout() { if(confirm('Çıkış yapmak istiyor musunuz?')) auth.signOut(); }
+function showErr(msg){const e=$('lgErr');e.textContent=msg;e.style.display='block';}
+function doLogout(){if(confirm('Çıkış yapmak istiyor musunuz?'))auth.signOut();}
 
-/* ── FIRESTORE ── */
-const docRef = () => db.collection('app').doc('data');
+/* ══════════════════════════════════════
+   FIRESTORE — yeni mimari:
+   users/{uid}/projects/{pid}
+   users/{uid}/activity (array, son 100)
+══════════════════════════════════════ */
+const userDoc = () => db.collection('users').doc(me.uid);
+const prjCol  = () => userDoc().collection('projects');
+const actDoc  = () => userDoc().collection('meta').doc('activity');
 
 function subscribe() {
   setSync('saving');
-  unsub = docRef().onSnapshot(snap => {
-    if (snap.exists) { allData = snap.data(); }
-    else { allData = {projects:{}, activity:[]}; docRef().set(allData); }
+
+  // Projects listener
+  unsub = prjCol().onSnapshot(snap => {
+    projects = {};
+    snap.forEach(doc => { projects[doc.id] = {id:doc.id, ...doc.data()}; });
     setSync('live');
     renderProjects();
-    if (activeProjectId) renderChecklist(activeProjectId);
-    if (activeSectionId) renderSection(activeSectionId);
+    if(activePid) renderChecklist();
+    if(activeSid) renderSection();
+  }, err => {
+    console.error('Firestore error:', err);
+    setSync('err');
+    showToast('Bağlantı hatası: '+err.message);
+  });
+
+  // Activity listener
+  actDoc().onSnapshot(snap => {
+    activity = snap.exists ? (snap.data().log || []) : [];
     renderActivity();
-  }, () => { setSync('offline'); toast('Bağlantı kesildi...'); });
+  }).catch(()=>{});
 }
 
-async function save(update) {
+async function saveProject(pid, data) {
   setSync('saving');
-  await docRef().update(update);
+  try {
+    await prjCol().doc(pid).set(data, {merge:true});
+  } catch(e) {
+    showToast('Kaydetme hatası: '+e.message);
+    setSync('err');
+    throw e;
+  }
 }
 
-function userName() { return currentUser.email.split('@')[0]; }
-
-async function logActivity(type, desc) {
-  const entry = { user: userName(), type, description: desc, time: firebase.firestore.FieldValue.serverTimestamp() };
-  await docRef().update({ activity: firebase.firestore.FieldValue.arrayUnion(entry) });
+async function logAct(type, desc, projName='') {
+  try {
+    const entry = {user:me_name(), type, description:desc, project:projName, time:Date.now()};
+    await actDoc().set({
+      log: firebase.firestore.FieldValue.arrayUnion(entry)
+    }, {merge:true});
+  } catch(e){/* activity log failure is non-critical */}
 }
 
-/* ── PROJECTS ── */
+/* ══════════════════════════════════════
+   RENDER: PROJECTS
+══════════════════════════════════════ */
 function renderProjects() {
-  const grid = document.getElementById('projectGrid');
-  const projects = allData.projects || {};
-  const keys = Object.keys(projects).sort((a,b) => (projects[b].createdAt||0)-(projects[a].createdAt||0));
-  
-  grid.innerHTML = '';
-  if (!keys.length) {
-    grid.innerHTML = '<div class="empty-state" style="padding:30px 0">Henüz proje yok.<br>Yeni proje ekleyin.</div>';
+  const grid=$('prjGrid');
+  const keys=Object.keys(projects).sort((a,b)=>(projects[b].createdAt||0)-(projects[a].createdAt||0));
+  $('prjSubtitle').textContent = keys.length ? keys.length+' aktif proje' : 'Henüz proje yok';
+
+  if(!keys.length) {
+    grid.innerHTML=`<div class="empty"><div class="empty-ic">🏗</div>Henüz proje eklenmemiş.<br>Aşağıdan yeni proje ekleyin.</div>`;
     return;
   }
-  
-  keys.forEach(pid => {
-    const proj = projects[pid];
-    const sections = proj.sections || {};
-    let total=0, done=0;
-    Object.values(sections).forEach(sec => {
-      const items = sec.items || {};
-      Object.values(items).forEach(item => { total++; if(item.checked) done++; });
-    });
-    const pct = total>0 ? Math.round(done/total*100) : 0;
-    const isDone = pct===100 && total>0;
 
-    const card = document.createElement('div');
-    card.className = 'project-card';
-    card.innerHTML = `
+  grid.innerHTML = keys.map(pid => {
+    const p = projects[pid];
+    const secs = p.sections||{};
+    let total=0, done=0;
+    Object.values(secs).forEach(s => Object.values(s.items||{}).forEach(i => {total++;if(i.checked)done++;}));
+    const pct = total>0 ? Math.round(done/total*100) : 0;
+    const cls = pct===100&&total>0?'done':pct>0?'active':'';
+    const fillCls = pct===100&&total>0?'pbar-fill done':pct>0?'pbar-fill active':'pbar-fill empty';
+    const secCount = Object.keys(secs).length;
+
+    return `<div class="proj-card" onclick="openProject('${pid}')">
       <div class="proj-top">
-        <div>
-          <div class="proj-name">${proj.name}</div>
+        <div style="flex:1;min-width:0">
+          <div class="proj-name">${esc(p.name)}</div>
           <div class="proj-meta">
-            ${proj.client ? `<span>👤 ${proj.client}</span>` : ''}
-            ${proj.address ? `<span>📍 ${proj.address}</span>` : ''}
-            ${proj.date ? `<span>📅 ${proj.date}</span>` : ''}
+            ${p.client?`<div class="proj-meta-row">👤 <span>${esc(p.client)}</span></div>`:''}
+            ${p.address?`<div class="proj-meta-row">📍 <span>${esc(p.address)}</span></div>`:''}
+            ${p.date?`<div class="proj-meta-row">📅 <span>${esc(p.date)}</span></div>`:''}
           </div>
         </div>
-        <div class="proj-pct ${isDone?'done':''}">${pct}%</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0">
+          <div class="proj-pct ${cls}">${pct}%</div>
+          <div style="display:flex;gap:6px">
+            <div class="icon-btn" onclick="event.stopPropagation();openEditProject('${pid}')" title="Düzenle">✏️</div>
+            <div class="icon-btn" onclick="event.stopPropagation();deleteProject('${pid}')" title="Sil">🗑</div>
+          </div>
+        </div>
       </div>
-      <div class="proj-bar"><div class="proj-fill ${isDone?'done':''}" style="width:${pct}%"></div></div>
-      <div class="proj-count">${done} / ${total} madde tamamlandı · ${Object.keys(sections).length} bölüm</div>
-    `;
-    card.onclick = () => openProject(pid);
-    grid.appendChild(card);
-  });
+      <div class="pbar"><div class="${fillCls}" style="width:${pct}%"></div></div>
+      <div class="proj-foot">
+        <span class="proj-stat">${done}/${total} madde · ${secCount} bölüm</span>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function openProject(pid) {
-  activeProjectId = pid;
-  activeSectionId = null;
-  renderChecklist(pid);
-  showScreen('checklist');
-  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
-}
+/* ══════════════════════════════════════
+   RENDER: CHECKLIST
+══════════════════════════════════════ */
+function renderChecklist() {
+  const p = projects[activePid]; if(!p) return;
+  $('chkTitle').textContent = p.name;
 
-function goToProjects() {
-  activeProjectId = null;
-  activeSectionId = null;
-  showScreen('projects');
-  switchTab('projects');
-}
+  const secs = p.sections||{};
+  const skeys = Object.keys(secs).sort((a,b)=>(secs[a].order||0)-(secs[b].order||0));
 
-/* ── CHECKLIST ── */
-function renderChecklist(pid) {
-  const proj = (allData.projects||{})[pid];
-  if (!proj) return;
-  document.getElementById('checklistTitle').textContent = proj.name;
-  
-  const sections = proj.sections || {};
-  const skeys = Object.keys(sections).sort((a,b)=>(sections[a].order||0)-(sections[b].order||0));
-  
-  let total=0, done=0;
+  let total=0, done=0, inprog=0;
   skeys.forEach(sid => {
-    const items = sections[sid].items || {};
-    Object.values(items).forEach(item => { total++; if(item.checked) done++; });
+    const items = secs[sid].items||{};
+    const ivals = Object.values(items);
+    const sd = ivals.filter(i=>i.checked).length;
+    const st = ivals.length;
+    total+=st; done+=sd;
+    if(sd>0&&sd<st) inprog++;
   });
-  
+
   const pct = total>0 ? Math.round(done/total*100) : 0;
-  document.getElementById('overallPct').textContent = pct+'%';
-  document.getElementById('overallFill').style.width = pct+'%';
-  document.getElementById('overallDone').textContent = done+' tamamlandı';
-  document.getElementById('overallTotal').textContent = total+' toplam';
-  const badge = document.getElementById('checklistBadge');
-  badge.textContent = pct+'%';
-  badge.className = 'detail-badge'+(pct===100&&total>0?' done':'');
-  
-  const list = document.getElementById('sectionList');
-  list.innerHTML = '';
-  
-  if (!skeys.length) {
-    list.innerHTML = '<div class="empty-state">Henüz bölüm yok.<br>Aşağıdan bölüm ekleyin.</div>';
+  const badgeCls = pct===100&&total>0?'done':pct>0?'prog':'pend';
+  $('chkBadge').textContent=pct+'%'; $('chkBadge').className='badge '+badgeCls;
+  $('sumPct').textContent=pct+'%';
+  $('sumFill').style.width=pct+'%';
+  $('sumDone').textContent=done+' tamamlandı';
+  $('sumTotal').textContent=total+' toplam';
+  $('sumStatus').innerHTML=[
+    total>0?`<span class="status-pill">${total-done} bekliyor</span>`:'',
+    inprog>0?`<span class="status-pill">${inprog} devam ediyor</span>`:'',
+    done>0?`<span class="status-pill">${done} tamamlandı</span>`:''
+  ].filter(Boolean).join('');
+
+  if(!skeys.length) {
+    $('secList').innerHTML=`<div class="empty"><div class="empty-ic">📂</div>Henüz bölüm yok.<br>Aşağıdan bölüm ekleyin.</div>`;
     return;
   }
 
-  skeys.forEach(sid => {
-    const sec = sections[sid];
-    const items = sec.items || {};
-    const secTotal = Object.keys(items).length;
-    const secDone = Object.values(items).filter(i=>i.checked).length;
-    const secPct = secTotal>0 ? Math.round(secDone/secTotal*100) : 0;
-    const isDone = secPct===100 && secTotal>0;
+  $('secList').innerHTML = skeys.map(sid => {
+    const sec = secs[sid];
+    const items = sec.items||{};
+    const ivals = Object.values(items);
+    const sd=ivals.filter(i=>i.checked).length, st=ivals.length;
+    const pct=st>0?Math.round(sd/st*100):0;
+    const cls=pct===100&&st>0?'done':pct>0?'prog':'';
+    const fillCls=pct===100&&st>0?'sec-bar-fill sec-fill-done':pct>0?'sec-bar-fill sec-fill-prog':'sec-bar-fill sec-fill-empty';
 
-    const card = document.createElement('div');
-    card.className = 'section-card';
-    card.innerHTML = `
-      <div class="sec-top" onclick="openSection('${sid}')">
+    return `<div class="sec-card">
+      <div class="sec-head" onclick="openSection('${sid}')">
         <div style="flex:1;min-width:0">
-          <div class="sec-num">${sec.num||''}</div>
-          <div class="sec-title">${sec.title}</div>
+          <div class="sec-num">${esc(sec.num||'')}</div>
+          <div class="sec-title">${esc(sec.title)}</div>
         </div>
-        <div style="text-align:right;flex-shrink:0;margin-left:12px">
-          <div class="sec-pct ${isDone?'done':''}">${secPct}%</div>
-          <div style="font-size:16px;color:var(--faint)">›</div>
+        <div class="sec-right">
+          <div class="sec-pct ${cls}">${pct}%</div>
+          <div class="sec-bar"><div class="${fillCls}" style="width:${pct}%"></div></div>
         </div>
       </div>
-      <div class="sec-bar"><div class="sec-fill ${isDone?'done':''}" style="width:${secPct}%"></div></div>
-      <div class="sec-count">${secDone} / ${secTotal} madde</div>
-      <div class="sec-actions">
-        <button class="sec-del-btn" onclick="deleteSection('${pid}','${sid}')">🗑 Bölümü Sil</button>
+      <div class="sec-stat">
+        <span>${sd}/${st} madde tamamlandı</span>
+        <button class="sec-del" onclick="deleteSection('${sid}')">🗑 Sil</button>
       </div>
-    `;
-    list.appendChild(card);
-  });
+    </div>`;
+  }).join('');
 }
 
-function openSection(sid) {
-  activeSectionId = sid;
-  renderSection(sid);
-  showScreen('section');
-}
+/* ══════════════════════════════════════
+   RENDER: SECTION ITEMS
+══════════════════════════════════════ */
+function renderSection() {
+  const p=projects[activePid]; if(!p) return;
+  const sec=(p.sections||{})[activeSid]; if(!sec) return;
+  $('secTitle').textContent=(sec.num?sec.num+' — ':'')+sec.title;
 
-function goToChecklist() {
-  activeSectionId = null;
-  showScreen('checklist');
-}
+  const items=sec.items||{};
+  const ikeys=Object.keys(items).sort((a,b)=>(items[a].order||0)-(items[b].order||0));
+  const total=ikeys.length, done=ikeys.filter(k=>items[k].checked).length;
+  const pct=total>0?Math.round(done/total*100):0;
+  const bcls=pct===100&&total>0?'done':pct>0?'prog':'pend';
+  $('secBadge').textContent=pct+'%'; $('secBadge').className='badge '+bcls;
 
-async function deleteSection(pid, sid) {
-  if (!confirm('Bu bölümü silmek istiyor musunuz? Tüm maddeler de silinecek.')) return;
-  await save({ [`projects.${pid}.sections.${sid}`]: firebase.firestore.FieldValue.delete() });
-  toast('Bölüm silindi');
-}
-
-/* ── SECTION ── */
-function renderSection(sid) {
-  const proj = (allData.projects||{})[activeProjectId];
-  if (!proj) return;
-  const sec = (proj.sections||{})[sid];
-  if (!sec) return;
-  
-  document.getElementById('sectionTitle').textContent = (sec.num?sec.num+' — ':'')+sec.title;
-  
-  const items = sec.items || {};
-  const ikeys = Object.keys(items).sort((a,b)=>(items[a].order||0)-(items[b].order||0));
-  const total = ikeys.length;
-  const done = ikeys.filter(k=>items[k].checked).length;
-  const pct = total>0 ? Math.round(done/total*100) : 0;
-  const badge = document.getElementById('sectionBadge');
-  badge.textContent = pct+'%';
-  badge.className = 'detail-badge'+(pct===100&&total>0?' done':'');
-
-  const list = document.getElementById('itemList');
-  list.innerHTML = '';
-
-  if (!ikeys.length) {
-    list.innerHTML = '<div class="empty-state">Henüz madde yok.<br>Aşağıdan madde ekleyin.</div>';
+  if(!ikeys.length) {
+    $('itemList').innerHTML=`<div class="empty"><div class="empty-ic">✅</div>Bölümde madde yok.<br>Aşağıdan madde ekleyin.</div>`;
     return;
   }
 
-  ikeys.forEach(iid => {
-    const item = items[iid];
-    const checked = !!item.checked;
-    const note = item.note || '';
-    const photos = item.photos || [];
+  $('itemList').innerHTML = ikeys.map(iid => {
+    const item=items[iid], chk=!!item.checked;
+    const photos=item.photos||[], note=item.note||'';
+    const hasExtra=note||photos.length;
 
-    const card = document.createElement('div');
-    card.className = 'item-card';
-    card.innerHTML = `
+    return `<div class="item-card ${chk?'checked':''}" id="ic-${iid}">
       <div class="item-main">
-        <div class="check-circle ${checked?'checked':''}" onclick="toggleCheck('${sid}','${iid}')"></div>
-        <div class="item-content">
-          <div class="item-title ${checked?'checked':''}">${item.title}</div>
-          ${item.desc ? `<div class="item-desc ${checked?'checked':''}">${item.desc}</div>` : ''}
-          ${item.checkedBy ? `<div class="item-who">${item.checkedBy} · ${timeAgo(item.checkedAt)}</div>` : ''}
+        <div class="chk ${chk?'on':''}" onclick="toggleCheck('${activeSid}','${iid}')" role="checkbox" aria-checked="${chk}" aria-label="${esc(item.title)}"></div>
+        <div class="item-body">
+          <div class="item-title ${chk?'on':''}">${esc(item.title)}</div>
+          ${item.desc?`<div class="item-desc ${chk?'on':''}">${esc(item.desc)}</div>`:''}
+          ${item.checkedBy?`<div class="item-who">✓ ${esc(item.checkedBy)} · ${timeAgo(item.checkedAt)}</div>`:''}
         </div>
-        <button onclick="deleteItem('${sid}','${iid}')" style="background:none;border:none;color:var(--faint);font-size:16px;cursor:pointer;flex-shrink:0">✕</button>
+        <button class="item-del" onclick="deleteItem('${activeSid}','${iid}')" aria-label="Sil">✕</button>
       </div>
-      <div class="item-actions">
-        <button class="action-btn" onclick="toggleNote('note-${iid}','extras-${iid}')">📝 Not</button>
-        <button class="action-btn" onclick="triggerPhoto('${iid}')">📷 Fotoğraf${photos.length>0?' ('+photos.length+')':''}</button>
+      <div class="item-btns">
+        <button class="act-btn" onclick="toggleExtra('${iid}')">📝 Not${note?' •':''}</button>
+        <button class="act-btn" onclick="triggerPhoto('${iid}')">📷 Fotoğraf${photos.length>0?' ('+photos.length+')':''}</button>
       </div>
-      <div class="item-extras" id="extras-${iid}" style="${note||photos.length?'':'display:none'}">
-        <div class="photo-strip" id="photos-${iid}" style="${photos.length?'':'display:none'}">
-          ${photos.map(p=>`<img class="photo-thumb" src="${p}">`).join('')}
-          <div class="photo-add" onclick="triggerPhoto('${iid}')">+</div>
-        </div>
-        <textarea class="note-area" id="note-${iid}" placeholder="Not ekle..." onblur="saveNote('${sid}','${iid}',this.value)">${note}</textarea>
+      <div class="item-extra" id="ie-${iid}" style="${hasExtra?'':'display:none'}">
+        ${photos.length?`<div class="photo-row" id="pr-${iid}">
+          ${photos.map((p,pi)=>`<img class="ph-thumb" src="${p}" onclick="openLb('${iid}',${pi})" alt="Fotoğraf ${pi+1}">`).join('')}
+          <div class="ph-add" onclick="triggerPhoto('${iid}')">＋</div>
+        </div>`:`<div class="photo-row" id="pr-${iid}" style="display:none"><div class="ph-add" onclick="triggerPhoto('${iid}')">＋</div></div>`}
+        <textarea class="note-ta" id="nt-${iid}" placeholder="Not ekle..." onblur="saveNote('${activeSid}','${iid}',this.value)">${esc(note)}</textarea>
       </div>
-      <input type="file" accept="image/*" capture="environment" class="hidden-input" id="pi-${iid}" onchange="handlePhoto('${sid}','${iid}',this)">
-    `;
-    list.appendChild(card);
-  });
+      <input type="file" accept="image/*" capture="environment" class="file-inp" id="fi-${iid}" onchange="handlePhoto('${activeSid}','${iid}',this)">
+    </div>`;
+  }).join('');
 }
 
-async function toggleCheck(sid, iid) {
-  const proj = (allData.projects||{})[activeProjectId];
-  const item = (proj.sections[sid].items||{})[iid];
-  const newVal = !item.checked;
-  const uname = userName();
-  const now = firebase.firestore.FieldValue.serverTimestamp();
-  
-  const update = {
-    [`projects.${activeProjectId}.sections.${sid}.items.${iid}.checked`]: newVal,
-    [`projects.${activeProjectId}.sections.${sid}.items.${iid}.checkedBy`]: newVal ? uname : firebase.firestore.FieldValue.delete(),
-    [`projects.${activeProjectId}.sections.${sid}.items.${iid}.checkedAt`]: newVal ? now : firebase.firestore.FieldValue.delete(),
-  };
-  
-  const actEntry = {
-    user: uname, type: newVal?'check':'uncheck',
-    description: (newVal?'Tamamladı: ':'Geri aldı: ')+item.title,
-    project: (allData.projects[activeProjectId]||{}).name||'',
-    time: now
-  };
-  update['activity'] = firebase.firestore.FieldValue.arrayUnion(actEntry);
-  await docRef().update(update);
-}
-
-function toggleNote(noteId, extrasId) {
-  const extras = document.getElementById(extrasId);
-  const ta = document.getElementById(noteId);
-  if (!extras) return;
-  if (extras.style.display==='none'||!extras.style.display) { extras.style.display=''; ta&&ta.focus(); }
-  else if (!(ta&&ta.value.trim())) extras.style.display='none';
-}
-
-async function saveNote(sid, iid, val) {
-  await save({ [`projects.${activeProjectId}.sections.${sid}.items.${iid}.note`]: val });
-  toast('Not kaydedildi');
-}
-
-async function deleteItem(sid, iid) {
-  if (!confirm('Bu maddeyi silmek istiyor musunuz?')) return;
-  await save({ [`projects.${activeProjectId}.sections.${sid}.items.${iid}`]: firebase.firestore.FieldValue.delete() });
-  toast('Madde silindi');
-}
-
-function triggerPhoto(iid) { document.getElementById('pi-'+iid)?.click(); }
-
-function handlePhoto(sid, iid, input) {
-  const file = input.files[0]; if (!file) return;
-  const img = new Image();
-  const url = URL.createObjectURL(file);
-  img.onload = async () => {
-    const canvas = document.createElement('canvas');
-    const max=800; let w=img.width, h=img.height;
-    if(w>max){h=Math.round(h*max/w);w=max;}
-    canvas.width=w; canvas.height=h;
-    canvas.getContext('2d').drawImage(img,0,0,w,h);
-    const dataUrl = canvas.toDataURL('image/jpeg',0.75);
-    URL.revokeObjectURL(url);
-    await docRef().update({ [`projects.${activeProjectId}.sections.${sid}.items.${iid}.photos`]: firebase.firestore.FieldValue.arrayUnion(dataUrl) });
-    toast('Fotoğraf kaydedildi');
-  };
-  img.src=url; input.value='';
-}
-
-/* ── ACTIVITY ── */
+/* ══════════════════════════════════════
+   RENDER: ACTIVITY
+══════════════════════════════════════ */
 function renderActivity() {
-  const list = document.getElementById('activityList');
-  const activity = (allData.activity||[]).slice().reverse().slice(0,40);
-  if (!activity.length) { list.innerHTML='<div class="empty-state">Henüz aktivite yok</div>'; return; }
-  list.innerHTML = activity.map(a=>`
-    <div class="activity-item">
-      <div class="act-user"><span class="act-dot ${a.type==='check'||a.type==='uncheck'?'check':a.type}"></span>${a.user}</div>
-      <div class="act-action">${a.description}</div>
-      <div class="act-time">${a.project||''} · ${timeAgo(a.time)}</div>
-    </div>
-  `).join('');
+  const list=$('actList');
+  const log=[...activity].reverse().slice(0,50);
+  if(!log.length){list.innerHTML=`<div class="empty"><div class="empty-ic">📋</div>Henüz aktivite yok</div>`;return;}
+  list.innerHTML=log.map(a=>`
+    <div class="act-item">
+      <div class="act-row">
+        <div class="act-dot ${a.type}"></div>
+        <span class="act-user">${esc(a.user)}</span>
+        <span class="act-proj">${a.project?'· '+esc(a.project):''}</span>
+      </div>
+      <div class="act-desc">${esc(a.description)}</div>
+      <div class="act-time">${timeAgo(a.time)}</div>
+    </div>`).join('');
 }
 
-/* ── MODALS ── */
-function showAddProject() {
-  modalMode = 'addProject';
-  document.getElementById('modalTitle').textContent = 'Yeni Proje Ekle';
-  document.getElementById('modalBody').innerHTML = `
-    <input class="inp" id="m_name" placeholder="Proje adı *" style="width:100%">
-    <input class="inp" id="m_client" placeholder="Müşteri adı" style="width:100%;margin-top:10px">
-    <input class="inp" id="m_address" placeholder="Adres / Konum" style="width:100%;margin-top:10px">
-    <input class="inp" id="m_date" placeholder="Tarih (ör: Mart 2025)" style="width:100%;margin-top:10px">
-  `;
-  document.getElementById('modalOverlay').classList.remove('hidden');
-  setTimeout(()=>document.getElementById('m_name').focus(),100);
+/* ══════════════════════════════════════
+   ACTIONS: PROJECTS
+══════════════════════════════════════ */
+function openProject(pid) {
+  activePid=pid; activeSid=null;
+  navStack.push('prj');
+  renderChecklist();
+  showScreen('chk');
 }
 
-function showAddSection() {
-  modalMode = 'addSection';
-  document.getElementById('modalTitle').textContent = 'Yeni Bölüm Ekle';
-  const proj = (allData.projects||{})[activeProjectId];
-  const secCount = Object.keys(proj?.sections||{}).length+1;
-  document.getElementById('modalBody').innerHTML = `
-    <input class="inp" id="m_secnum" placeholder="Bölüm no (ör: 07)" value="${secCount<10?'0'+secCount:secCount}" style="width:100%">
-    <input class="inp" id="m_sectitle" placeholder="Bölüm adı *" style="width:100%;margin-top:10px">
-  `;
-  document.getElementById('modalOverlay').classList.remove('hidden');
-  setTimeout(()=>document.getElementById('m_sectitle').focus(),100);
+async function deleteProject(pid) {
+  const p=projects[pid]; if(!p) return;
+  const name=p.name;
+  // Soft delete with undo
+  delete projects[pid];
+  renderProjects();
+  showToast(`"${name}" silindi`, async()=>{
+    // undo: restore
+    try { await prjCol().doc(pid).set(p); } catch(e){ showToast('Geri alma hatası'); }
+  });
+  // actual delete after toast timeout
+  setTimeout(async()=>{
+    if(pendingUndo===null) {
+      try { await prjCol().doc(pid).delete(); } catch(e){ showToast('Silme hatası'); }
+    }
+  },5500);
 }
 
-function showAddItem() {
-  modalMode = 'addItem';
-  document.getElementById('modalTitle').textContent = 'Yeni Madde Ekle';
-  document.getElementById('modalBody').innerHTML = `
-    <input class="inp" id="m_itemtitle" placeholder="Madde başlığı *" style="width:100%">
-    <textarea class="inp" id="m_itemdesc" placeholder="Açıklama (opsiyonel)" style="width:100%;margin-top:10px;min-height:80px;resize:none"></textarea>
-  `;
-  document.getElementById('modalOverlay').classList.remove('hidden');
-  setTimeout(()=>document.getElementById('m_itemtitle').focus(),100);
+function openEditProject(pid) {
+  const p=projects[pid]; if(!p) return;
+  modalMode='editProject';
+  modalData={pid};
+  $('modalTitle').textContent='Projeyi Düzenle';
+  $('modalBody').innerHTML=`
+    <div class="inp-group"><div class="inp-label">Proje Adı *</div>
+      <input class="inp" id="m_name" value="${esc(p.name)}" placeholder="Proje adı" inputmode="text"></div>
+    <div class="inp-group" style="margin-top:10px"><div class="inp-label">Müşteri</div>
+      <input class="inp" id="m_client" value="${esc(p.client||'')}" placeholder="Müşteri adı"></div>
+    <div class="inp-group" style="margin-top:10px"><div class="inp-label">Adres</div>
+      <input class="inp" id="m_addr" value="${esc(p.address||'')}" placeholder="Adres / Konum"></div>
+    <div class="inp-group" style="margin-top:10px"><div class="inp-label">Tarih</div>
+      <input class="inp" id="m_date" value="${esc(p.date||'')}" placeholder="ör: Mart 2025"></div>`;
+  showModal();
+  setTimeout(()=>$('m_name')?.focus(),300);
 }
+
+/* ══════════════════════════════════════
+   ACTIONS: SECTIONS
+══════════════════════════════════════ */
+function openSection(sid) {
+  activeSid=sid;
+  navStack.push('chk');
+  renderSection();
+  showScreen('sec');
+}
+
+async function deleteSection(sid) {
+  const p=projects[activePid]; if(!p) return;
+  const sec=(p.sections||{})[sid];
+  if(!sec) return;
+  const backup=JSON.parse(JSON.stringify(sec));
+  // optimistic delete
+  delete projects[activePid].sections[sid];
+  renderChecklist();
+  showToast(`"${sec.title}" silindi`, async()=>{
+    try {
+      const update={[`sections.${sid}`]:backup};
+      await prjCol().doc(activePid).update(update);
+    } catch(e){showToast('Geri alma hatası');}
+  });
+  setTimeout(async()=>{
+    if(pendingUndo===null){
+      try {
+        await prjCol().doc(activePid).update({[`sections.${sid}`]:firebase.firestore.FieldValue.delete()});
+      } catch(e){showToast('Silme hatası');}
+    }
+  },5500);
+}
+
+/* ══════════════════════════════════════
+   ACTIONS: ITEMS
+══════════════════════════════════════ */
+async function toggleCheck(sid, iid) {
+  const p=projects[activePid]; if(!p) return;
+  const item=((p.sections||{})[sid]?.items||{})[iid]; if(!item) return;
+  const newVal=!item.checked;
+  const now=Date.now();
+
+  // Optimistic update
+  projects[activePid].sections[sid].items[iid].checked=newVal;
+  projects[activePid].sections[sid].items[iid].checkedBy=newVal?me_name():undefined;
+  projects[activePid].sections[sid].items[iid].checkedAt=newVal?now:undefined;
+  renderSection(); renderChecklist();
+
+  try {
+    const upd={
+      [`sections.${sid}.items.${iid}.checked`]:newVal,
+      [`sections.${sid}.items.${iid}.checkedBy`]:newVal?me_name():firebase.firestore.FieldValue.delete(),
+      [`sections.${sid}.items.${iid}.checkedAt`]:newVal?now:firebase.firestore.FieldValue.delete(),
+    };
+    await prjCol().doc(activePid).update(upd);
+    await logAct(newVal?'check':'uncheck',(newVal?'Tamamladı: ':'Geri aldı: ')+item.title, p.name);
+  } catch(e) {
+    // rollback
+    projects[activePid].sections[sid].items[iid].checked=!newVal;
+    renderSection(); renderChecklist();
+    showToast('Kaydetme hatası');
+  }
+}
+
+function toggleExtra(iid) {
+  const el=$('ie-'+iid), ta=$('nt-'+iid);
+  if(!el) return;
+  if(el.style.display==='none'||!el.style.display){
+    el.style.display='';
+    setTimeout(()=>ta?.focus(),150);
+  } else if(!ta?.value?.trim() && !$('pr-'+iid)?.querySelector('img')) {
+    el.style.display='none';
+  }
+}
+
+async function saveNote(sid,iid,val) {
+  try {
+    await prjCol().doc(activePid).update({[`sections.${sid}.items.${iid}.note`]:val});
+    showToast('Not kaydedildi ✓');
+  } catch(e){showToast('Not kaydedilemedi');}
+}
+
+async function deleteItem(sid,iid) {
+  const p=projects[activePid]; if(!p) return;
+  const item=((p.sections||{})[sid]?.items||{})[iid]; if(!item) return;
+  const backup=JSON.parse(JSON.stringify(item));
+
+  delete projects[activePid].sections[sid].items[iid];
+  renderSection(); renderChecklist();
+
+  showToast(`"${item.title}" silindi`, async()=>{
+    try {
+      await prjCol().doc(activePid).update({[`sections.${sid}.items.${iid}`]:backup});
+    } catch(e){showToast('Geri alma hatası');}
+  });
+  setTimeout(async()=>{
+    if(pendingUndo===null){
+      try {
+        await prjCol().doc(activePid).update({[`sections.${sid}.items.${iid}`]:firebase.firestore.FieldValue.delete()});
+      } catch(e){showToast('Silme hatası');}
+    }
+  },5500);
+}
+
+function triggerPhoto(iid){$('fi-'+iid)?.click();}
+
+async function handlePhoto(sid,iid,input) {
+  const file=input.files[0]; if(!file) return;
+  input.value='';
+  showToast('Yükleniyor...');
+  try {
+    // Compress
+    const dataUrl = await new Promise((res,rej)=>{
+      const img=new Image(), url=URL.createObjectURL(file);
+      img.onload=()=>{
+        const max=1200; let w=img.width, h=img.height;
+        if(w>max){h=Math.round(h*max/w);w=max;}
+        const c=document.createElement('canvas'); c.width=w; c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        URL.revokeObjectURL(url);
+        res(c.toDataURL('image/jpeg',.82));
+      };
+      img.onerror=rej; img.src=url;
+    });
+    // Upload to Firebase Storage
+    const path=`photos/${me.uid}/${activePid}/${sid}/${iid}/${uid()}.jpg`;
+    const ref=storage.ref(path);
+    await ref.putString(dataUrl,'data_url');
+    const url=await ref.getDownloadURL();
+    await prjCol().doc(activePid).update({
+      [`sections.${sid}.items.${iid}.photos`]:firebase.firestore.FieldValue.arrayUnion(url)
+    });
+    await logAct('photo','Fotoğraf ekledi: '+((projects[activePid]?.sections?.[sid]?.items?.[iid]?.title)||''), projects[activePid]?.name||'');
+    showToast('Fotoğraf kaydedildi ✓');
+  } catch(e){
+    showToast('Fotoğraf yüklenemedi: '+e.message);
+  }
+}
+
+/* ══════════════════════════════════════
+   LIGHTBOX
+══════════════════════════════════════ */
+let lbPhotos=[], lbIdx=0;
+function openLb(iid, idx) {
+  const p=projects[activePid];
+  const photos=((p?.sections||{})[activeSid]?.items||{})[iid]?.photos||[];
+  lbPhotos=photos; lbIdx=idx;
+  $('lbImg').src=photos[idx];
+  $('lb').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeLb(){$('lb').classList.remove('show');document.body.style.overflow='';}
+// Swipe lightbox
+let lbStartX=0;
+$('lb').addEventListener('touchstart',e=>lbStartX=e.touches[0].clientX,{passive:true});
+$('lb').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-lbStartX;
+  if(Math.abs(dx)>60){
+    lbIdx=(lbIdx+(dx<0?1:-1)+lbPhotos.length)%lbPhotos.length;
+    $('lbImg').src=lbPhotos[lbIdx];
+  }
+},{passive:true});
+
+/* ══════════════════════════════════════
+   MODAL
+══════════════════════════════════════ */
+let modalData={};
+
+function openModal(type) {
+  modalMode=type; modalData={};
+  const titles={project:'Yeni Proje',section:'Yeni Bölüm',item:'Yeni Madde',editProject:'Projeyi Düzenle'};
+  $('modalTitle').textContent=titles[type]||'';
+
+  if(type==='project'){
+    $('modalBody').innerHTML=`
+      <div class="inp-group"><div class="inp-label">Proje Adı *</div><input class="inp" id="m_name" placeholder="ör: Çankaya Dairesi" inputmode="text" autocomplete="off"></div>
+      <div class="inp-group" style="margin-top:10px"><div class="inp-label">Müşteri</div><input class="inp" id="m_client" placeholder="Müşteri adı"></div>
+      <div class="inp-group" style="margin-top:10px"><div class="inp-label">Adres</div><input class="inp" id="m_addr" placeholder="Adres / Konum"></div>
+      <div class="inp-group" style="margin-top:10px"><div class="inp-label">Tarih</div><input class="inp" id="m_date" placeholder="ör: Nisan 2025"></div>`;
+    showModal();
+    setTimeout(()=>$('m_name')?.focus(),300);
+  }
+  else if(type==='section'){
+    const p=projects[activePid];
+    const n=Object.keys(p?.sections||{}).length+1;
+    $('modalBody').innerHTML=`
+      <div class="inp-group"><div class="inp-label">Bölüm No</div><input class="inp" id="m_snum" value="${n<10?'0'+n:n}" placeholder="ör: 07" inputmode="numeric"></div>
+      <div class="inp-group" style="margin-top:10px"><div class="inp-label">Bölüm Adı *</div><input class="inp" id="m_stitle" placeholder="ör: Zemin Hazırlık" inputmode="text" autocomplete="off"></div>`;
+    showModal();
+    setTimeout(()=>$('m_stitle')?.focus(),300);
+  }
+  else if(type==='item'){
+    $('modalBody').innerHTML=`
+      <div class="inp-group"><div class="inp-label">Madde Başlığı *</div><input class="inp" id="m_ititle" placeholder="ör: Su yalıtımı kontrolü" inputmode="text" autocomplete="off"></div>
+      <div class="inp-group" style="margin-top:10px"><div class="inp-label">Açıklama</div><textarea class="inp" id="m_idesc" placeholder="Detay açıklama (opsiyonel)" style="min-height:80px;resize:none"></textarea></div>`;
+    showModal();
+    setTimeout(()=>{const inp=$('m_ititle');if(inp){inp.focus();inp.click();}},300);
+  }
+}
+
+function showModal(){$('modalBg').classList.add('show');}
+function closeModal(){$('modalBg').classList.remove('show');modalMode=null;}
+function bgClose(e){if(e.target===$('modalBg'))closeModal();}
 
 async function modalSave() {
-  if (modalMode==='addProject') {
-    const name = document.getElementById('m_name')?.value.trim();
-    if (!name) { toast('Proje adı zorunlu'); return; }
-    const pid = uid();
-    await save({
-      [`projects.${pid}`]: {
-        id: pid, name,
-        client: document.getElementById('m_client')?.value.trim()||'',
-        address: document.getElementById('m_address')?.value.trim()||'',
-        date: document.getElementById('m_date')?.value.trim()||'',
-        sections: {},
-        createdAt: Date.now(),
-        createdBy: userName()
-      }
-    });
-    toast('Proje eklendi');
+  const btn=$('modalSaveBtn');
+  btn.disabled=true; btn.textContent='Kaydediliyor...';
+  try {
+    if(modalMode==='project'||modalMode==='editProject'){
+      const name=($('m_name')?.value||'').trim();
+      if(!name){showToast('Proje adı zorunlu');btn.disabled=false;btn.textContent='Kaydet';return;}
+      const pid=modalMode==='editProject'?modalData.pid:uid();
+      const existing=modalMode==='editProject'?projects[pid]:{};
+      await saveProject(pid,{
+        ...existing, id:pid, name,
+        client:($('m_client')?.value||'').trim(),
+        address:($('m_addr')?.value||'').trim(),
+        date:($('m_date')?.value||'').trim(),
+        sections:existing.sections||{},
+        createdAt:existing.createdAt||Date.now(),
+        createdBy:existing.createdBy||me_name(),
+        updatedAt:Date.now()
+      });
+      showToast(modalMode==='editProject'?'Proje güncellendi ✓':'Proje eklendi ✓');
+    }
+    else if(modalMode==='section'){
+      const title=($('m_stitle')?.value||'').trim();
+      if(!title){showToast('Bölüm adı zorunlu');btn.disabled=false;btn.textContent='Kaydet';return;}
+      const sid=uid();
+      const p=projects[activePid];
+      const order=Object.keys(p?.sections||{}).length;
+      await prjCol().doc(activePid).update({[`sections.${sid}`]:{
+        id:sid, title, num:($('m_snum')?.value||'').trim(),
+        order, items:{}, createdAt:Date.now()
+      }});
+      showToast('Bölüm eklendi ✓');
+    }
+    else if(modalMode==='item'){
+      const title=($('m_ititle')?.value||'').trim();
+      if(!title){showToast('Madde başlığı zorunlu');btn.disabled=false;btn.textContent='Kaydet';return;}
+      const iid=uid();
+      const sec=(projects[activePid]?.sections||{})[activeSid];
+      const order=Object.keys(sec?.items||{}).length;
+      await prjCol().doc(activePid).update({[`sections.${activeSid}.items.${iid}`]:{
+        id:iid, title, desc:($('m_idesc')?.value||'').trim(),
+        checked:false, order, createdAt:Date.now()
+      }});
+      showToast('Madde eklendi ✓');
+    }
+    closeModal();
+  } catch(e){
+    showToast('Hata: '+e.message);
+  } finally {
+    btn.disabled=false; btn.textContent='Kaydet';
   }
-  else if (modalMode==='addSection') {
-    const title = document.getElementById('m_sectitle')?.value.trim();
-    if (!title) { toast('Bölüm adı zorunlu'); return; }
-    const sid = uid();
-    const proj = (allData.projects||{})[activeProjectId];
-    const order = Object.keys(proj?.sections||{}).length;
-    await save({
-      [`projects.${activeProjectId}.sections.${sid}`]: {
-        id: sid, title,
-        num: document.getElementById('m_secnum')?.value.trim()||'',
-        order, items: {}, createdAt: Date.now()
-      }
-    });
-    toast('Bölüm eklendi');
-  }
-  else if (modalMode==='addItem') {
-    const title = document.getElementById('m_itemtitle')?.value.trim();
-    if (!title) { toast('Madde başlığı zorunlu'); return; }
-    const iid = uid();
-    const sec = ((allData.projects||{})[activeProjectId]?.sections||{})[activeSectionId];
-    const order = Object.keys(sec?.items||{}).length;
-    await save({
-      [`projects.${activeProjectId}.sections.${activeSectionId}.items.${iid}`]: {
-        id: iid, title,
-        desc: document.getElementById('m_itemdesc')?.value.trim()||'',
-        checked: false, order, createdAt: Date.now()
-      }
-    });
-    toast('Madde eklendi');
-  }
-  closeModalDirect();
 }
 
-function closeModal(e) { if(e.target===document.getElementById('modalOverlay')) closeModalDirect(); }
-function closeModalDirect() { document.getElementById('modalOverlay').classList.add('hidden'); modalMode=null; }
+// Enter key in modal
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeModal();
+  if(e.key==='Enter'&&e.target.tagName!=='TEXTAREA'&&$('modalBg').classList.contains('show'))modalSave();
+});
 
-/* ── NAV ── */
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen'+name.charAt(0).toUpperCase()+name.slice(1)).classList.add('active');
+/* ══════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════ */
+const screenMap={prj:'sPrj',chk:'sChk',sec:'sSec',act:'sAct'};
+
+function showScreen(key) {
+  Object.values(screenMap).forEach(id=>{const el=$(id);if(el)el.classList.remove('on');});
+  const el=$(screenMap[key]); if(el)el.classList.add('on');
+  // scroll to top
+  if(el)el.scrollTop=0;
 }
 
 function switchTab(tab) {
-  if (tab==='projects') {
-    goToProjects();
-  } else {
-    showScreen(tab);
-    document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
-    document.getElementById('tab-'+tab)?.classList.add('active');
-  }
+  navStack=[];
+  activePid=null; activeSid=null;
+  showScreen(tab);
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  $('t'+tab.charAt(0).toUpperCase()+tab.slice(1))?.classList.add('on');
 }
+
+function navBack() {
+  const prev=navStack.pop();
+  if(prev==='prj'){activePid=null;activeSid=null;showScreen('prj');switchTab('prj');}
+  else if(prev==='chk'){activeSid=null;renderChecklist();showScreen('chk');}
+  else{showScreen('prj');switchTab('prj');}
+}
+
+// Hardware back / swipe back (Android)
+window.addEventListener('popstate',()=>navBack());
+history.pushState(null,'','');
 </script>
 </body>
 </html>
